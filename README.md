@@ -114,6 +114,10 @@ The gem also allows you to specify additional sort orders to resolve conflicts w
 If the `:sort_order` is not specified, the conflicts will be resolved using the `id asc` sort order.
 
 ## Roadmap 
+* Single Method Call - Add the `leaderboard` instance method to return the results from all 3 methods `current_movie_rank`, `movies_around` and `top_movies` with a single call.
+* Multiple configurations - Allow configuring multiple leaderboards (based on different columns) in the same model.
+* Scopes - Calculate leaderboards and ranking for a specific scope. For example, this will help us generate leaderboards for all movies released in 2012 or for all movies produced by DreamWorks, etc.
+
 
 ## Authors
 * Nitin Misra: https://github.com/nitinstp23
