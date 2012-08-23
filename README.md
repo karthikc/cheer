@@ -116,8 +116,8 @@ If the `:sort_order` is not specified, the conflicts will be resolved using the 
 ## Roadmap 
 
 ## Authors
-Nitin Misra: https://github.com/nitinstp23
-Rakesh Verma: https://github.com/rakesh87
+* Nitin Misra: https://github.com/nitinstp23
+* Rakesh Verma: https://github.com/rakesh87
 
 
 ## Contributing
