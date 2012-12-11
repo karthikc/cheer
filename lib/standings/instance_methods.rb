@@ -12,7 +12,7 @@ module Standings
     end
 
     def define_instance_methods
-      singular_model_name = self.class.model_name.singularize
+      singular_model_name = self.class.ranking_model_name.singularize
       self.class.class_eval do
         define_method "current_#{singular_model_name}_rank" do
           rank = self.high_rankers
@@ -21,7 +21,7 @@ module Standings
           end
           return rank
         end
-        define_method "#{self.model_name}_around" do
+        define_method "#{self.ranking_model_name}_around" do
           off_set = self.send("current_#{singular_model_name}_rank".to_sym) - (self.class.rank_config.around_limit + 1)
           limit_setting = self.class.rank_config.around_limit*2 + 1
           if off_set < 0
