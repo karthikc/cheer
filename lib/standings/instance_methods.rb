@@ -19,21 +19,23 @@ module Standings
           if self.equal_rankers?
             return rank + self.equal_rankers.order(self.class.rank_config.sort_order.join(',')).index(self)
           end
-          return rank
+          rank
         end
+
         define_method "#{self.ranking_model_name}_around" do
-          off_set = self.send("current_#{singular_model_name}_rank".to_sym) - (self.class.rank_config.around_limit + 1)
+          offset = self.send("current_#{singular_model_name}_rank".to_sym) - (self.class.rank_config.around_limit + 1)
           limit_setting = self.class.rank_config.around_limit*2 + 1
-          if off_set < 0
-            limit_setting += off_set
-            off_set = 0
+          if offset < 0
+            limit_setting += offset
+            offset = 0
           end
-          self.class.order("#{self.class.rank_config.column_name} DESC,#{self.class.rank_config.sort_order.join(',')}").limit(limit_setting).offset(off_set)
+          self.class.order("#{self.class.rank_config.column_name} DESC,#{self.class.rank_config.sort_order.join(',')}").limit(limit_setting).offset(offset)
         end
       end
     end
 
     protected
+
     def high_rankers
       self.class.where("#{self.class.rank_config.column_name} > ?", self.send(self.class.rank_config.column_name.to_sym))
       .order("#{self.class.rank_config.column_name} DESC").size + 1

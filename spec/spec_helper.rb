@@ -13,21 +13,29 @@ require 'sqlite3'
 require 'standings'
 
 ActiveRecord::Base.establish_connection(
-  :adapter => "sqlite3",
-  :database => ":memory:"
+  adapter: "sqlite3",
+  database: ":memory:"
 )
 
 RSpec.configure do |config|
+
+  config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
   config.before(:each) do
     DatabaseCleaner.start
   end
+
   config.after(:each) do
     DatabaseCleaner.clean
   end
+
   config.treat_symbols_as_metadata_keys_with_true_values = true
-  config.run_all_when_everything_filtered = true
-  config.filter_run :focus
   config.order = 'random'
+  config.filter_run :focus
+  config.run_all_when_everything_filtered = true
+
 end
 
 ActiveRecord::Migration.verbose = false
@@ -35,38 +43,38 @@ ActiveRecord::Migration.verbose = false
 ActiveRecord::Schema.define do
   create_table :game_users do |t|
     t.string :name
-    t.float :score, :default => 0.0
-    t.integer :age, :default => 20
+    t.float :score, default: 0.0
+    t.integer :age, default: 20
     t.timestamps
   end
-  
+
   create_table :products do |t|
     t.string :name
-    t.float :price, :default => 0.0
-    t.integer :review, :default => 1
+    t.float :price, default: 0.0
+    t.integer :review, default: 1
     t.timestamps
   end
 
   create_table :students do |t|
     t.string :name
-    t.float :score, :default => 0.0
-    t.integer :age, :default => 5
+    t.float :score, default: 0.0
+    t.integer :age, default: 5
     t.timestamps
   end
 end
 
 class GameUser < ActiveRecord::Base
-  #rank_by column_name array_of_sort_column_names hash_of_options
-  rank_by :score, :sort_order => ["name", "age DESC"], :around_limit => 2
+  # rank_by column_name, array_of_sort_column_names, hash_of_options
+  rank_by :score, sort_order: ["name", "age DESC"], around_limit: 2
 end
 
 class Product < ActiveRecord::Base
-  #rank_by column_name array_of_sort_column_names hash_of_options
-  rank_by :price, :sort_order => %w(name), :around_limit => 3
+  # rank_by column_name, array_of_sort_column_names, hash_of_options
+  rank_by :price, sort_order: %w(name), around_limit: 3
 end
 
 class Student < ActiveRecord::Base
-  #rank_by column_name array_of_sort_column_names hash_of_options
+  # rank_by column_name, array_of_sort_column_names, hash_of_options
   # Default Sort Order will be ID for students with equal score.
   rank_by :score
 end

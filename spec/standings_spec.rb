@@ -1,31 +1,28 @@
 require 'spec_helper'
 
 describe Standings do
-  before(:each) do
-  end
-
   def create_game_users!
-    @jack_sparrow = GameUser.create!(name: 'Jack Sparrow', score: 12)
-    @harry_potter = GameUser.create!(name: 'Harry Potter', score: 14)
-    @ron_weasely = GameUser.create!(name: 'Ron Weasely', score: 23)
+    @dark_lord         = GameUser.create!(name: 'Dark Lord', score: 11)
+    @tom_riddle        = GameUser.create!(name: 'Tom Riddle', score: 25)
+    @ron_weasely       = GameUser.create!(name: 'Ron Weasely', score: 23)
+    @harry_potter      = GameUser.create!(name: 'Harry Potter', score: 14)
+    @jack_sparrow      = GameUser.create!(name: 'Jack Sparrow', score: 12)
     @albus_dumbelldore = GameUser.create!(name: 'Albus Dumbelldore', score: 2)
-    @tom_riddle = GameUser.create!(name: 'Tom Riddle', score: 25)
-    @dark_lord = GameUser.create!(name: 'Dark Lord', score: 11)
   end
 
   def create_game_users_with_equal_score!
-    @jack_sparrow_1 = GameUser.create!(name: 'Jack Sparrow', score: 12, age: 22)
-    @jack_sparrow_2 = GameUser.create!(name: 'Jack Sparrow', score: 12, age: 23)
-    @harry_potter = GameUser.create!(name: 'Harry Potter', score: 14)
-    @ivan_potter = GameUser.create!(name: 'Ivan Potter', score: 14)
-    @jerry_potter = GameUser.create!(name: 'Jerry Potter', score: 14)
-    @ron_weasely = GameUser.create!(name: 'Ron Weasely', score: 23)
-    @albus_dumbelldore = GameUser.create!(name: 'Albus Dumbelldore', score: 2)
+    @dark_lord           = GameUser.create!(name: 'Dark Lord', score: 11)
+    @tom_riddle          = GameUser.create!(name: 'Tom Riddle', score: 25)
+    @ivan_potter         = GameUser.create!(name: 'Ivan Potter', score: 14)
+    @ron_weasely         = GameUser.create!(name: 'Ron Weasely', score: 23)
+    @harry_potter        = GameUser.create!(name: 'Harry Potter', score: 14)
+    @jerry_potter        = GameUser.create!(name: 'Jerry Potter', score: 14)
+    @jack_sparrow_1      = GameUser.create!(name: 'Jack Sparrow', score: 12, age: 22)
+    @jack_sparrow_2      = GameUser.create!(name: 'Jack Sparrow', score: 12, age: 23)
+    @albus_dumbelldore   = GameUser.create!(name: 'Albus Dumbelldore', score: 2)
     @duglous_dumbelldore = GameUser.create!(name: 'Duglous Dumbelldore', score: 2)
-    @tom_riddle = GameUser.create!(name: 'Tom Riddle', score: 25)
-    @dark_lord = GameUser.create!(name: 'Dark Lord', score: 11)
   end
-  
+
   def create_products!
     @product_1 = Product.create!(name: 'cell', price: 122)
     @product_2 = Product.create!(name: 'ring', price: 14)
@@ -36,15 +33,15 @@ describe Standings do
   end
 
   def create_students_with_equal_score!
-    @subrat = Student.create!(name: 'Subrat Behera', score: 23)
-    @rakesh = Student.create!(name: 'Rakesh Verma', score: 22)
-    @girish = Student.create!(name: 'Girish Kumar', score: 21)
-    @nitin = Student.create!(name: 'Nitin Misra', score: 22)
+    @subrat   = Student.create!(name: 'Subrat Behera', score: 23)
+    @rakesh   = Student.create!(name: 'Rakesh Verma', score: 22)
+    @girish   = Student.create!(name: 'Girish Kumar', score: 21)
+    @nitin    = Student.create!(name: 'Nitin Misra', score: 22)
+    @bhanu    = Student.create!(name: 'Bhanu Chander', score: 19)
     @prateeth = Student.create!(name: 'Prateeth S', score: 20)
-    @bhanu = Student.create!(name: 'Bhanu Chander', score: 19)
   end
 
-  it "should return the current user rank" do
+  it "returns the current user rank" do
     create_game_users!
     @jack_sparrow.current_game_user_rank.should be == 4
     @harry_potter.current_game_user_rank.should be == 3
@@ -54,7 +51,7 @@ describe Standings do
     @dark_lord.current_game_user_rank.should be == 5
   end
 
-  it "should return the current user rank if users with equal score exists" do
+  it "returns the current user rank if users with equal score exists" do
     create_game_users_with_equal_score!
     @jack_sparrow_1.current_game_user_rank.should be == 7
     @jack_sparrow_2.current_game_user_rank.should be == 6
@@ -68,7 +65,7 @@ describe Standings do
     @dark_lord.current_game_user_rank.should be == 8
   end
 
-  it "should return the current student rank if students with equal score exists" do
+  it "returns the current student rank if students with equal score exists" do
     # For equal score students sorting should be done oon the basis of id,
     # since Student model doesn't define sort_columns array.
     create_students_with_equal_score!
@@ -80,7 +77,7 @@ describe Standings do
     @bhanu.current_student_rank.should be == 6
   end
 
-  it "should return the top rank users" do
+  it "returns the top rank users" do
     create_game_users!
     GameUser.top_game_users(2).should be == [@tom_riddle, @ron_weasely]
     GameUser.top_game_users(5).should be == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow, @dark_lord]
@@ -89,7 +86,7 @@ describe Standings do
     GameUser.top_game_users.should be == [@tom_riddle, @ron_weasely, @harry_potter]
   end
 
-  it "should return the top rank users if equal score users exists" do
+  it "returns the top rank users if equal score users exists" do
     create_game_users_with_equal_score!
     GameUser.top_game_users(2).should be == [@tom_riddle, @ron_weasely]
     GameUser.top_game_users(5).should be == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter, @jerry_potter]
@@ -98,14 +95,14 @@ describe Standings do
     GameUser.top_game_users.should be == [@tom_riddle, @ron_weasely, @harry_potter]
   end
 
-  it "return user around to current user according score descending" do
+  it "returns user around to current user according score descending" do
     create_game_users!
     @harry_potter.game_users_around.should be == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow, @dark_lord]
     @tom_riddle.game_users_around.should be == [@tom_riddle, @ron_weasely, @harry_potter]
     @albus_dumbelldore.game_users_around.should be == [@jack_sparrow, @dark_lord, @albus_dumbelldore]
   end
 
-  it "should return user around current user if users with equal score exists" do
+  it "returns user around current user if users with equal score exists" do
     create_game_users_with_equal_score!
     @jack_sparrow_1.game_users_around.should be == [@jerry_potter, @jack_sparrow_2, @jack_sparrow_1, @dark_lord, @albus_dumbelldore]
     @jack_sparrow_2.game_users_around.should be == [@ivan_potter, @jerry_potter, @jack_sparrow_2, @jack_sparrow_1, @dark_lord]
@@ -119,7 +116,7 @@ describe Standings do
     @dark_lord.game_users_around.should be == [@jack_sparrow_2, @jack_sparrow_1, @dark_lord, @albus_dumbelldore, @duglous_dumbelldore]
   end
 
-  it "should return the current product rank" do
+  it "returns the current product rank" do
     create_products!
     @product_1.current_product_rank.should be == 3
     @product_2.current_product_rank.should be == 5
@@ -128,8 +125,8 @@ describe Standings do
     @product_5.current_product_rank.should be == 1
     @product_6.current_product_rank.should be == 6
   end
-  
-  it "should return the Top products" do
+
+  it "returns the Top products" do
     create_products!
     Product.top_products(2).should be == [@product_5, @product_3]
     Product.top_products(3).should be == [@product_5, @product_3, @product_1]
@@ -138,8 +135,8 @@ describe Standings do
     Product.top_products(6).should be == [@product_5, @product_3, @product_1, @product_4, @product_2, @product_6]
     Product.top_products(7).should be == [@product_5, @product_3, @product_1, @product_4, @product_2, @product_6]
   end
-  
-  it "should return product around the current product" do
+
+  it "returns product around the current product" do
     create_products!
     @product_1.products_around.should be == [@product_5, @product_3, @product_1, @product_4, @product_2, @product_6]
     @product_2.products_around.should be == [@product_3, @product_1, @product_4, @product_2, @product_6]
@@ -149,4 +146,35 @@ describe Standings do
     @product_6.products_around.should be == [@product_1, @product_4, @product_2, @product_6]
   end
 
+  # Bad Configurations
+  context "Bad Configuration Options" do
+
+    it "fails if primary column_name is absent" do
+      lambda do
+        Class.new(ActiveRecord::Base) do
+          # Without primary column name
+          rank_by sort_order: ["name", "age DESC"], around_limit: 2
+        end
+      end.should raise_error(Error::InvalidColumnName)
+    end
+
+    it "fails if sort_order is not an array" do
+      lambda do
+        Class.new(ActiveRecord::Base) do
+          # Invalid sort order
+          rank_by :score, sort_order: "name", around_limit: 2
+        end
+      end.should raise_error(Error::InvalidSortOrder)
+    end
+
+    it "fails if around_limit is zero or less" do
+      lambda do
+        Class.new(ActiveRecord::Base) do
+          # Invalid around limit
+          rank_by :score, sort_order: ["name", "age DESC"], around_limit: [0, -1, -2].sample
+        end
+      end.should raise_error(Error::InvalidAroundLimit)
+    end
+
+  end
 end
