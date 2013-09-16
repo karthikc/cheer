@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
 
   # Add development dependencies
   gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'debugger'
   gem.add_development_dependency 'rspec', '~> 2.14'
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'database_cleaner', '~> 0.9.1'

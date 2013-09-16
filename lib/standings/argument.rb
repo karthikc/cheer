@@ -1,5 +1,3 @@
-require 'standings/error'
-
 module Standings
   class Argument
 

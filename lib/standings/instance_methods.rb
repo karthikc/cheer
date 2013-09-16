@@ -3,51 +3,39 @@ module Standings
 
     def method_missing(method_id, *args, &block)
       method_name = method_id.to_s.to_sym
-      if !self.methods.include?(method_name)
-        self.define_instance_methods
-        self.send(method_name, *args, &block)
-      else
+
+      # Call super if method is already defined or it excludes standing methods list.
+      if self.methods.include?(method_name) || !self.class.standing_methods.include?(method_name)
         super
+      else
+        define_instance_methods
+        public_send(method_name, *args, &block)
       end
     end
+
+    private
 
     def define_instance_methods
-      singular_model_name = self.class.ranking_model_name.singularize
       self.class.class_eval do
-        define_method "current_#{singular_model_name}_rank" do
-          rank = self.high_rankers
-          if self.equal_rankers?
-            return rank + self.equal_rankers.order(self.class.rank_config.sort_order.join(',')).index(self)
-          end
-          rank
+        delegate :current_rank,
+                 :rank_around,
+                 to: :rank_evaluator
+
+        # Define Rank Evaluator Method
+        define_method :rank_evaluator do
+          @rank_evaluator ||= RankEvaluator.new(self)
         end
 
-        define_method "#{self.ranking_model_name}_around" do
-          offset = self.send("current_#{singular_model_name}_rank".to_sym) - (self.class.rank_config.around_limit + 1)
-          limit_setting = self.class.rank_config.around_limit*2 + 1
-          if offset < 0
-            limit_setting += offset
-            offset = 0
-          end
-          self.class.order("#{self.class.rank_config.column_name} DESC,#{self.class.rank_config.sort_order.join(',')}").limit(limit_setting).offset(offset)
+        # Define Current Rank Method
+        define_method self.standing_methods.first do
+          current_rank
+        end
+
+        # Define Around Rank Method
+        define_method self.standing_methods.last do
+          rank_around
         end
       end
-    end
-
-    protected
-
-    def high_rankers
-      self.class.where("#{self.class.rank_config.column_name} > ?", self.send(self.class.rank_config.column_name.to_sym))
-      .order("#{self.class.rank_config.column_name} DESC").size + 1
-    end
-
-    def equal_rankers?
-      equal_rankers = self.equal_rankers
-      equal_rankers && (equal_rankers.size > 1)
-    end
-
-    def equal_rankers
-      self.class.where("#{self.class.rank_config.column_name} = ?", self.send(self.class.rank_config.column_name.to_sym))
     end
   end
 end

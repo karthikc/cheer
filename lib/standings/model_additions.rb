@@ -1,6 +1,3 @@
-require 'standings/class_methods'
-require 'standings/instance_methods'
-
 module Standings
   module ModelAdditions
     # Hookup event for ModelAdditions Module
