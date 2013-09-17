@@ -9,12 +9,15 @@ module Standings
       define_class_methods
     end
 
+    private
+
     def define_class_methods
       ranking_model_name = self.ranking_model_name
 
       self.const_set(:STANDING_METHODS, [
         "current_#{ranking_model_name.singularize}_rank".to_sym,
-        "#{ranking_model_name}_around".to_sym
+        "#{ranking_model_name}_around".to_sym,
+        :leaderboard
       ])
 
       self.class.instance_eval do
@@ -25,8 +28,6 @@ module Standings
         define_method :standing_methods do
           self::STANDING_METHODS
         end
-
-        private_class_method :standing_methods
       end
     end
   end

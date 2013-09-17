@@ -20,7 +20,17 @@ module Standings
           offset = 0
         end
 
-        model_klass.order("#{rank_column_name} DESC, #{combined_sort_order}").limit(limit_setting).offset(offset)
+        model_klass.order("#{rank_column_name} DESC, #{combined_sort_order}")
+        .limit(limit_setting)
+        .offset(offset)
+      end
+
+      def prepare_leaderboard(user_limit = 3)
+        {
+          current_rank: current_rank,
+          rank_around: rank_around,
+          top_rankers_method => model_klass.public_send(top_rankers_method, user_limit)
+        }
       end
 
       private
@@ -63,6 +73,10 @@ module Standings
 
       def position_amongst_equal_rankers
         equal_rankers.pluck(:id).index(model_object.id).to_i
+      end
+
+      def top_rankers_method
+        "top_#{model_klass.ranking_model_name}".to_sym
       end
     end
   end

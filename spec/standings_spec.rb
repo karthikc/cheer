@@ -109,39 +109,77 @@ describe Standings do
 
   context "Products" do
     before do
-      @product_1 = Product.create!(name: 'cell', price: 122)
-      @product_2 = Product.create!(name: 'ring', price: 14)
-      @product_3 = Product.create!(name: 'shooe', price: 235)
-      @product_4 = Product.create!(name: 'belt', price: 21)
-      @product_5 = Product.create!(name: 'watch', price: 267)
-      @product_6 = Product.create!(name: 'food', price: 9)
+      @cell  = Product.create!(name: 'cell', price: 122)
+      @ring  = Product.create!(name: 'ring', price: 14)
+      @shoe  = Product.create!(name: 'shoe', price: 235)
+      @belt  = Product.create!(name: 'belt', price: 21)
+      @watch = Product.create!(name: 'watch', price: 267)
+      @food  = Product.create!(name: 'food', price: 9)
     end
 
     it "returns the current product rank" do
-      @product_1.current_product_rank.should == 3
-      @product_2.current_product_rank.should == 5
-      @product_3.current_product_rank.should == 2
-      @product_4.current_product_rank.should == 4
-      @product_5.current_product_rank.should == 1
-      @product_6.current_product_rank.should == 6
+      @cell.current_product_rank.should  == 3
+      @ring.current_product_rank.should  == 5
+      @shoe.current_product_rank.should  == 2
+      @belt.current_product_rank.should  == 4
+      @watch.current_product_rank.should == 1
+      @food.current_product_rank.should  == 6
     end
 
     it "returns the Top products" do
-      Product.top_products(2).should == [@product_5, @product_3]
-      Product.top_products(3).should == [@product_5, @product_3, @product_1]
-      Product.top_products(4).should == [@product_5, @product_3, @product_1, @product_4]
-      Product.top_products(5).should == [@product_5, @product_3, @product_1, @product_4, @product_2]
-      Product.top_products(6).should == [@product_5, @product_3, @product_1, @product_4, @product_2, @product_6]
-      Product.top_products(7).should == [@product_5, @product_3, @product_1, @product_4, @product_2, @product_6]
+      Product.top_products(2).should == [@watch, @shoe]
+      Product.top_products(3).should == [@watch, @shoe, @cell]
+      Product.top_products(4).should == [@watch, @shoe, @cell, @belt]
+      Product.top_products(5).should == [@watch, @shoe, @cell, @belt, @ring]
+      Product.top_products(6).should == [@watch, @shoe, @cell, @belt, @ring, @food]
+      Product.top_products(7).should == [@watch, @shoe, @cell, @belt, @ring, @food]
     end
 
     it "returns product around the current product" do
-      @product_1.products_around.should == [@product_5, @product_3, @product_1, @product_4, @product_2, @product_6]
-      @product_2.products_around.should == [@product_3, @product_1, @product_4, @product_2, @product_6]
-      @product_3.products_around.should == [@product_5, @product_3, @product_1, @product_4, @product_2]
-      @product_4.products_around.should == [@product_5, @product_3, @product_1, @product_4, @product_2, @product_6]
-      @product_5.products_around.should == [@product_5, @product_3, @product_1, @product_4]
-      @product_6.products_around.should == [@product_1, @product_4, @product_2, @product_6]
+      @cell.products_around.should  == [@watch, @shoe, @cell, @belt, @ring, @food]
+      @ring.products_around.should  == [@shoe, @cell, @belt, @ring, @food]
+      @shoe.products_around.should  == [@watch, @shoe, @cell, @belt, @ring]
+      @belt.products_around.should  == [@watch, @shoe, @cell, @belt, @ring, @food]
+      @watch.products_around.should == [@watch, @shoe, @cell, @belt]
+      @food.products_around.should  == [@cell, @belt, @ring, @food]
+    end
+
+    it "returns leaderboard for the current product" do
+      @cell.leaderboard.should  == {
+        current_rank: @cell.current_product_rank,
+        rank_around: @cell.products_around,
+        top_products: Product.top_products
+      }
+
+      @ring.leaderboard(5).should  == {
+        current_rank: @ring.current_product_rank,
+        rank_around: @ring.products_around,
+        top_products: Product.top_products(5)
+      }
+
+      @shoe.leaderboard(2).should  == {
+        current_rank: @shoe.current_product_rank,
+        rank_around: @shoe.products_around,
+        top_products: Product.top_products(2)
+      }
+
+      @belt.leaderboard.should  == {
+        current_rank: @belt.current_product_rank,
+        rank_around: @belt.products_around,
+        top_products: Product.top_products
+      }
+
+      @watch.leaderboard(4).should  == {
+        current_rank: @watch.current_product_rank,
+        rank_around: @watch.products_around,
+        top_products: Product.top_products(4)
+      }
+
+      @food.leaderboard(3).should  == {
+        current_rank: @food.current_product_rank,
+        rank_around: @food.products_around,
+        top_products: Product.top_products
+      }
     end
   end
 
