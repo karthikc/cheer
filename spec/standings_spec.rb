@@ -146,38 +146,38 @@ describe Standings do
 
     it "returns leaderboard for the current product" do
       @cell.leaderboard.should  == {
-        current_rank: @cell.current_product_rank,
-        rank_around: @cell.products_around,
+        current_product_rank: @cell.current_product_rank,
+        products_around: @cell.products_around,
         top_products: Product.top_products
       }
 
       @ring.leaderboard(5).should  == {
-        current_rank: @ring.current_product_rank,
-        rank_around: @ring.products_around,
+        current_product_rank: @ring.current_product_rank,
+        products_around: @ring.products_around,
         top_products: Product.top_products(5)
       }
 
       @shoe.leaderboard(2).should  == {
-        current_rank: @shoe.current_product_rank,
-        rank_around: @shoe.products_around,
+        current_product_rank: @shoe.current_product_rank,
+        products_around: @shoe.products_around,
         top_products: Product.top_products(2)
       }
 
       @belt.leaderboard.should  == {
-        current_rank: @belt.current_product_rank,
-        rank_around: @belt.products_around,
+        current_product_rank: @belt.current_product_rank,
+        products_around: @belt.products_around,
         top_products: Product.top_products
       }
 
       @watch.leaderboard(4).should  == {
-        current_rank: @watch.current_product_rank,
-        rank_around: @watch.products_around,
+        current_product_rank: @watch.current_product_rank,
+        products_around: @watch.products_around,
         top_products: Product.top_products(4)
       }
 
       @food.leaderboard(3).should  == {
-        current_rank: @food.current_product_rank,
-        rank_around: @food.products_around,
+        current_product_rank: @food.current_product_rank,
+        products_around: @food.products_around,
         top_products: Product.top_products
       }
     end

@@ -24,17 +24,32 @@ Or install it yourself as:
 
 ## Basic Usage
 
-Consider you have a `Movie` model which has a `views` column that stores the number of times users have viewed the movie. 
+Consider you have a `Movie` model which has a `views` column that stores the number of times users have viewed the movie.
 
 ```ruby
  class Movie < ActiveRecord::Base
    rank_by :views
  end
-``` 
+```
+
+### Class methods
+
+The gem will automatically add the `top_movies` class method to the `Movie` class which will return the top 3 movies based on the number of views. The method also takes an optional parameter that specifies the number of movies needed. Based on the above example, the output of the `top_movies` method will be as follows:
+
+```ruby
+  Movie.top_movies # Will return the 3 movies "Pulp Fiction", "Reservoir Dogs" & "Kill Bill"
+  Movie.top_movies(2) # Will return the 2 movies "Pulp Fiction" & "Reservoir Dogs"
+```
 
 ### Instance methods
 
-This will automatically add the instance methods `current_movie_rank` and `movies_around` to the `Movie` class. The `current_movie_rank` method can be used to determine the movie's rank based on the number of views. The `movies_around` method returns an array of 5 movies that are around the current movie i.e. 2 movies on either side of the current movie and the current movie.
+The gem will automatically add the following instance methods to the `Movie` class :
+
+* `current_movie_rank` : This method can be used to determine the movie's rank based on the number of views.
+
+* `movies_around` : This method returns an array of 5 movies that are around the current movie i.e. 2 movies on either side of the current movie including the current movie.
+
+* `leaderboard` : This method returns a hash containing results from all three methods `current_movie_rank`, `movies_around` and `top_movies`.
 
 For example consider the following movies in the database:
 
@@ -70,21 +85,15 @@ The output of the 2 methods will be as follows:
 ```ruby
   kill_bill = Movie.find_by_name("Kill Bill")
   kill_bill.current_movie_rank # Will return "3"
-  kill_bill.movies_around #Will return the 5 movies "Pulp Fiction", "Reservoir Dogs", "Kill Bill", "Death Proof" & "Jackie Brown"
+  kill_bill.movies_around # Will return the 5 movies "Pulp Fiction", "Reservoir Dogs", "Kill Bill", "Death Proof" & "Jackie Brown"
+  kill_bill.leaderboard # Will return this hash - {current_movie_rank:3,movies_around:["Pulp Fiction","Reservoir Dogs","Kill Bill","Death Proof","Jackie Brown"],top_movies:["Pulp Fiction","Reservoir Dogs","Kill Bill"]}
+
 
   reservoir_dogs = Movie.find_by_name("Reservoir Dogs")
   reservoir_dogs.current_movie_rank # Will return "2"
-  reservoir_dogs.movies_around #Will return the 4 movies "Pulp Fiction", "Reservoir Dogs", "Kill Bill" & "Death Proof"
+  reservoir_dogs.movies_around # Will return the 4 movies "Pulp Fiction", "Reservoir Dogs", "Kill Bill" & "Death Proof"
+  reservoir_dogs.leaderboard # Will return this hash - {current_movie_rank: 2, movies_around: ["Pulp Fiction", "Reservoir Dogs", "Kill Bill", "Death Proof"], top_movies: ["Pulp Fiction", "Reservoir Dogs","Kill Bill"]}
 ````
-
-### Class methods
-
-The gem will also add the class method `top_movies` which will return the top 3 movies based on the number of views. The method also takes an optional parameter that specifies the number of movies needed. Based on the above example, the output of the `top_movies` method will be as follows:
-
-```ruby
-  Movie.top_movies #Will return the 3 movies "Pulp Fiction", "Reservoir Dogs" & "Kill Bill"
-  Movie.top_movies(2) #Will return the 2 movies "Pulp Fiction" & "Reservoir Dogs"
-```
 
 ## Additional Options
 
@@ -96,24 +105,24 @@ The default number of objects returned by `movies_around` can be overwritten usi
  class Movie < ActiveRecord::Base
    rank_by :views, :around_limit => 1
  end
- 
+
  kill_bill = Movie.find_by_name("Kill Bill")
  kill_bill.movies_around #Will return the 3 movies "Reservoir Dogs", "Kill Bill" & "Death Proof"
-``` 
+```
 
 ### :sort_order
 
 ```ruby
  class Movie < ActiveRecord::Base
    rank_by :views, :sort_order => ["released_on asc", "number_of_awards desc"]
- end 
-``` 
+ end
+```
 
 The gem also allows you to specify additional sort orders to resolve conflicts when there are a bunch of movies with the same number of views. The additional sort order can be specified as shown above. In this case, if two movies have the same number of views, the one released earlier will have a higher ranking. In case the number of views and the release date is the same, the one with more awards will have a higher ranking.
 
 If the `:sort_order` is not specified, the conflicts will be resolved using the `id asc` sort order.
 
-## Roadmap 
+## Roadmap
 * Single Method Call - Add the `leaderboard` instance method to return the results from all 3 methods `current_movie_rank`, `movies_around` and `top_movies` with a single call.
 * Multiple configurations - Allow configuring multiple leaderboards (based on different columns) in the same model.
 * Scopes - Calculate leaderboards and ranking for a specific scope. For example, this will help us generate leaderboards for all movies released in 2012 or for all movies produced by DreamWorks, etc.

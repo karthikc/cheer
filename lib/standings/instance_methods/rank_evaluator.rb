@@ -27,8 +27,8 @@ module Standings
 
       def prepare_leaderboard(user_limit = 3)
         {
-          current_rank: current_rank,
-          rank_around: rank_around,
+          model_klass.standing_methods[0] => current_rank,
+          model_klass.standing_methods[1] => rank_around,
           top_rankers_method => model_klass.public_send(top_rankers_method, user_limit)
         }
       end

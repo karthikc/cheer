@@ -4,7 +4,8 @@ module Standings
     def method_missing(method_id, *args, &block)
       method_name = method_id.to_s.to_sym
 
-      # Call super if method is already defined or it excludes standing methods list.
+      # Call super if method is already defined or
+      # it excludes standing methods list.
       if method_unknown?(method_name)
         super
       else

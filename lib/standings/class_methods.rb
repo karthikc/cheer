@@ -22,7 +22,8 @@ module Standings
 
       self.class.instance_eval do
         define_method "top_#{ranking_model_name}" do |user_limit = 3|
-          self.order("#{self.rank_config.column_name} DESC, #{self.rank_config.sort_order.join(',')}").limit(user_limit)
+          self.order("#{self.rank_config.column_name} DESC, #{self.rank_config.sort_order.join(',')}")
+          .limit(user_limit)
         end
 
         define_method :standing_methods do
