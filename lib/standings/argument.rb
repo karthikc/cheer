@@ -12,8 +12,8 @@ module Standings
       validate_sort_order
       validate_around_limit
 
-      # Ensure Id is always present in Sort Order.
-      sort_order.push("id") unless sort_order.include?("id")
+      # Ensure 'id' is always present in Sort Order.
+      sort_order | ["id"]
     end
 
     private
@@ -41,5 +41,6 @@ module Standings
     def validate_sort_order
       raise Error::InvalidSortOrder unless sort_order.is_a?(Array)
     end
+
   end
 end

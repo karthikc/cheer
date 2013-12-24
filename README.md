@@ -27,9 +27,11 @@ Or install it yourself as:
 Consider you have a `Movie` model which has a `views` column that stores the number of times users have viewed the movie.
 
 ```ruby
- class Movie < ActiveRecord::Base
-   rank_by :views
- end
+class Movie < ActiveRecord::Base
+  extend Standings::ModelAdditions
+
+  rank_by :views
+end
 ```
 
 ### Class methods
@@ -50,6 +52,7 @@ The gem will automatically add the following instance methods to the `Movie` cla
 * `movies_around` : This method returns an array of 5 movies that are around the current movie i.e. 2 movies on either side of the current movie including the current movie.
 
 * `leaderboard` : This method returns a hash containing results from all three methods `current_movie_rank`, `movies_around` and `top_movies`.
+It takes an optional argument(integer) to limit the number of records returned from `top_movies` method.
 
 For example consider the following movies in the database:
 
@@ -57,43 +60,52 @@ For example consider the following movies in the database:
     <tr>
         <th>Name</th>
         <th>Views</th>
+        <th>Profit</th>
     </tr>
     <tr>
         <td>Pulp Fiction</td>
         <td>50</td>
+        <td>$500</td>
     </tr>
     <tr>
         <td>Reservoir Dogs</td>
         <td>40</td>
+        <td>$600</td>
     </tr>
     <tr>
         <td>Kill Bill</td>
         <td>30</td>
+        <td>$200</td>
     </tr>
     <tr>
         <td>Death Proof</td>
         <td>20</td>
+        <td>$100</td>
     </tr>
     <tr>
         <td>Jackie Brown</td>
         <td>10</td>
+        <td>$400</td>
     </tr>
 </table>
 
 The output of the 2 methods will be as follows:
 
 ```ruby
-  kill_bill = Movie.find_by_name("Kill Bill")
-  kill_bill.current_movie_rank # Will return "3"
-  kill_bill.movies_around # Will return the 5 movies "Pulp Fiction", "Reservoir Dogs", "Kill Bill", "Death Proof" & "Jackie Brown"
-  kill_bill.leaderboard # Will return this hash - {current_movie_rank:3,movies_around:["Pulp Fiction","Reservoir Dogs","Kill Bill","Death Proof","Jackie Brown"],top_movies:["Pulp Fiction","Reservoir Dogs","Kill Bill"]}
-
-
+  pulp_fiction   = Movie.find_by_name("Pulp Fiction")
   reservoir_dogs = Movie.find_by_name("Reservoir Dogs")
-  reservoir_dogs.current_movie_rank # Will return "2"
-  reservoir_dogs.movies_around # Will return the 4 movies "Pulp Fiction", "Reservoir Dogs", "Kill Bill" & "Death Proof"
-  reservoir_dogs.leaderboard # Will return this hash - {current_movie_rank: 2, movies_around: ["Pulp Fiction", "Reservoir Dogs", "Kill Bill", "Death Proof"], top_movies: ["Pulp Fiction", "Reservoir Dogs","Kill Bill"]}
-````
+  kill_bill      = Movie.find_by_name("Kill Bill")
+  death_proof    = Movie.find_by_name("Death Proof")
+  jackie_brown   = Movie.find_by_name("Jackie Brown")
+
+  kill_bill.current_movie_rank # => 3
+  kill_bill.movies_around # => [pulp_fiction, reservoir_dogs, kill_bill, death_proof, jackie_brown]
+  kill_bill.leaderboard(2) # => {current_movie_rank: 3, movies_around: [pulp_fiction,reservoir_dogs,kill_bill,death_proof,jackie_brown], top_movies: [pulp_fiction,reservoir_dogs]}
+
+  reservoir_dogs.current_movie_rank # => 2
+  reservoir_dogs.movies_around # => [pulp_fiction, reservoir_dogs, kill_bill, death_proof]
+  reservoir_dogs.leaderboard # => {current_movie_rank: 2, movies_around: [pulp_fiction, reservoir_dogs, kill_bill, death_proof], top_movies: [pulp_fiction, reservoir_dogs,kill_bill]}
+```
 
 ## Additional Options
 
@@ -102,29 +114,58 @@ The output of the 2 methods will be as follows:
 The default number of objects returned by `movies_around` can be overwritten using the option `around_limit`. In the example below, we set the option to 1 forcing the gem to return at most 1 movie before and after the current movie:
 
 ```ruby
- class Movie < ActiveRecord::Base
-   rank_by :views, :around_limit => 1
- end
+class Movie < ActiveRecord::Base
+  extend Standings::ModelAdditions
 
- kill_bill = Movie.find_by_name("Kill Bill")
- kill_bill.movies_around #Will return the 3 movies "Reservoir Dogs", "Kill Bill" & "Death Proof"
+  rank_by :views, around_limit: 1
+end
+
+kill_bill = Movie.find_by_name("Kill Bill")
+kill_bill.movies_around # => [reservoir_dogs, kill_bill, death_proof]
 ```
 
 ### :sort_order
 
 ```ruby
- class Movie < ActiveRecord::Base
-   rank_by :views, :sort_order => ["released_on asc", "number_of_awards desc"]
- end
+class Movie < ActiveRecord::Base
+  extend Standings::ModelAdditions
+
+  rank_by :views, sort_order: ["released_on asc", "number_of_awards desc"]
+end
 ```
 
 The gem also allows you to specify additional sort orders to resolve conflicts when there are a bunch of movies with the same number of views. The additional sort order can be specified as shown above. In this case, if two movies have the same number of views, the one released earlier will have a higher ranking. In case the number of views and the release date is the same, the one with more awards will have a higher ranking.
 
 If the `:sort_order` is not specified, the conflicts will be resolved using the `id asc` sort order.
 
+
+## Custom Leaderboards
+
+The gem will automatically add the `add_leaderboard` class method to the Movie class which will allow
+you to configure custom leaderboards.
+This method takes these arguments: `name`, `column_name`, `sort_order`, `around_limit`.
+
+```ruby
+class Movie < ActiveRecord::Base
+  extend Standings::ModelAdditions
+
+  add_leaderboard :most_profitable, :profit, sort_order: %w(name), around_limit: 1
+  # This will add the :most_profitable instance method.
+  # It also takes an optional argument(integer) to limit the number of records returned from `top_movies` method.
+end
+
+pulp_fiction   = Movie.find_by_name("Pulp Fiction")
+reservoir_dogs = Movie.find_by_name("Reservoir Dogs")
+kill_bill      = Movie.find_by_name("Kill Bill")
+death_proof    = Movie.find_by_name("Death Proof")
+jackie_brown   = Movie.find_by_name("Jackie Brown")
+
+pulp_fiction.most_profitable # => {current_movie_rank: 2, movies_around: [reservoir_dogs, pulp_fiction, jackie_brown], top_movies: [pulp_fiction, reservoir_dogs, kill_bill]}
+
+death_proof.most_profitable(2) # => {current_movie_rank: 6, movies_around: [kill_bill, death_proof], top_movies: [pulp_fiction, reservoir_dogs]}
+```
+
 ## Roadmap
-* Single Method Call - Add the `leaderboard` instance method to return the results from all 3 methods `current_movie_rank`, `movies_around` and `top_movies` with a single call.
-* Multiple configurations - Allow configuring multiple leaderboards (based on different columns) in the same model.
 * Scopes - Calculate leaderboards and ranking for a specific scope. For example, this will help us generate leaderboards for all movies released in 2012 or for all movies produced by DreamWorks, etc.
 
 

@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe Standings do
   context "Students With Equal Score" do
+
     before do
+      Student.delete_all
       @subrat   = Student.create!(name: 'Subrat Behera', score: 23)
       @rakesh   = Student.create!(name: 'Rakesh Verma', score: 22)
       @girish   = Student.create!(name: 'Girish Kumar', score: 21)
@@ -14,7 +16,6 @@ describe Standings do
     it "returns the current student rank if students with equal score exists" do
       # For students with equal scores, sorting should be done on the basis of id,
       # since the Student model doesn't define sort_order array.
-
       @bhanu.current_student_rank.should    == 6
       @nitin.current_student_rank.should    == 3
       @subrat.current_student_rank.should   == 1
@@ -26,6 +27,7 @@ describe Standings do
 
   context "GameUsers" do
     before do
+      GameUser.delete_all
       @dark_lord         = GameUser.create!(name: 'Dark Lord', score: 11)
       @tom_riddle        = GameUser.create!(name: 'Tom Riddle', score: 25)
       @ron_weasely       = GameUser.create!(name: 'Ron Weasely', score: 23)
@@ -60,6 +62,7 @@ describe Standings do
 
   context "GameUsers With Equal Score" do
     before do
+      GameUser.delete_all
       @dark_lord           = GameUser.create!(name: 'Dark Lord', score: 11)
       @tom_riddle          = GameUser.create!(name: 'Tom Riddle', score: 25)
       @ivan_potter         = GameUser.create!(name: 'Ivan Potter', score: 14)
@@ -109,6 +112,7 @@ describe Standings do
 
   context "Products" do
     before do
+      Product.delete_all
       @cell  = Product.create!(name: 'cell', price: 122)
       @ring  = Product.create!(name: 'ring', price: 14)
       @shoe  = Product.create!(name: 'shoe', price: 235)
@@ -187,7 +191,9 @@ describe Standings do
   context "Bad Configuration Options" do
     it "fails if primary column_name is absent" do
       lambda do
-        Class.new(ActiveRecord::Base) do
+        class ModelOne < ActiveRecord::Base
+          extend Standings::ModelAdditions
+
           # Without primary column name
           rank_by sort_order: ["name", "age DESC"], around_limit: 2
         end
@@ -196,7 +202,9 @@ describe Standings do
 
     it "fails if sort_order is not an array" do
       lambda do
-        Class.new(ActiveRecord::Base) do
+        class ModelTwo < ActiveRecord::Base
+          extend Standings::ModelAdditions
+
           # Invalid sort order
           rank_by :score, sort_order: "name", around_limit: 2
         end
@@ -205,7 +213,9 @@ describe Standings do
 
     it "fails if around_limit is zero or less" do
       lambda do
-        Class.new(ActiveRecord::Base) do
+        class ModelThree < ActiveRecord::Base
+          extend Standings::ModelAdditions
+
           # Invalid around limit
           rank_by :score, sort_order: ["name", "age DESC"], around_limit: [0, -1, -2].sample
         end
@@ -213,12 +223,53 @@ describe Standings do
     end
   end
 
-  describe "#method_missing" do
-    it "doesn't define instance methods unless any of the standing method is called" do
-      product = Product.create!(name: 'cell', price: 122)
+  describe ".add_leaderboard" do
+    before do
+      Developer.delete_all
+      @aaron = Developer.create!(name: 'Aaron Patterson', ruby_gems_created: 100, total_experience: 15)
+      @corey = Developer.create!(name: 'Corey Haines', ruby_gems_created: 90, total_experience: 20)
+      @jim   = Developer.create!(name: 'Jim Weirich', ruby_gems_created: 50, total_experience: 30)
+    end
 
-      Product.any_instance.should_not_receive(:define_instance_methods)
-      lambda { product.unknown_method }.should raise_error(NoMethodError)
+    it "returns ruby_heroes leaderboard" do
+      @aaron.ruby_heroes.should == {
+        current_developer_rank: 1,
+        developers_around: [ @aaron, @corey, @jim ],
+        top_developers: [ @aaron, @corey, @jim ]
+      }
+
+      @corey.ruby_heroes(1).should == {
+        current_developer_rank: 2,
+        developers_around: [ @aaron, @corey, @jim ],
+        top_developers: [ @aaron ]
+      }
+
+      @jim.ruby_heroes(2).should == {
+        current_developer_rank: 3,
+        developers_around: [ @aaron, @corey, @jim ],
+        top_developers: [ @aaron, @corey ]
+      }
+    end
+
+    it "returns veterans leaderboard" do
+      @aaron.veterans(2).should == {
+        current_developer_rank: 3,
+        developers_around: [ @corey, @aaron ],
+        top_developers: [ @jim, @corey ]
+      }
+
+      @corey.veterans.should == {
+        current_developer_rank: 2,
+        developers_around: [ @jim, @corey, @aaron ],
+        top_developers: [ @jim, @corey, @aaron ]
+      }
+
+      @jim.veterans(1).should == {
+        current_developer_rank: 1,
+        developers_around: [ @jim, @corey ],
+        top_developers: [ @jim ]
+      }
     end
   end
+
 end

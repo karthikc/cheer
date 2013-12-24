@@ -8,7 +8,6 @@ $:.unshift File.dirname(__FILE__) + '/../lib'
 
 require 'active_record'
 require 'active_support/inflector'
-require 'database_cleaner'
 require 'sqlite3'
 require 'standings'
 
@@ -18,24 +17,10 @@ ActiveRecord::Base.establish_connection(
 )
 
 RSpec.configure do |config|
-
-  config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation)
-  end
-
-  config.before(:each) do
-    DatabaseCleaner.start
-  end
-
-  config.after(:each) do
-    DatabaseCleaner.clean
-  end
-
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.order = 'random'
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
-
 end
 
 ActiveRecord::Migration.verbose = false
@@ -61,20 +46,43 @@ ActiveRecord::Schema.define do
     t.integer :age, default: 5
     t.timestamps
   end
+
+  create_table :developers do |t|
+    t.string :name
+    t.float :total_experience, default: 0.0
+    t.integer :ruby_gems_created, default: 0
+    t.timestamps
+  end
+
 end
 
 class GameUser < ActiveRecord::Base
+  extend Standings::ModelAdditions
+
   # rank_by column_name, array_of_sort_column_names, hash_of_options
   rank_by :score, sort_order: ["name", "age DESC"], around_limit: 2
 end
 
 class Product < ActiveRecord::Base
+  extend Standings::ModelAdditions
+
   # rank_by column_name, array_of_sort_column_names, hash_of_options
   rank_by :price, sort_order: %w(name), around_limit: 3
 end
 
 class Student < ActiveRecord::Base
+  extend Standings::ModelAdditions
+
   # rank_by column_name, array_of_sort_column_names, hash_of_options
   # Default Sort Order will be ID for students with equal score.
   rank_by :score
+end
+
+class Developer < ActiveRecord::Base
+  extend Standings::ModelAdditions
+
+  # add_leaderboard name, column_name, array_of_sort_column_names, hash_of_options
+  # Default Sort Order will be ID for developers with equal score.
+  add_leaderboard :ruby_heroes, :ruby_gems_created, sort_order: %w(name), around_limit: 3
+  add_leaderboard :veterans, :total_experience, sort_order: %w(name), around_limit: 1
 end
