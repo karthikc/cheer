@@ -149,37 +149,44 @@ describe Standings do
     end
 
     it "returns leaderboard for the current product" do
-      @cell.leaderboard.should  == {
+      @cell.leaderboard.instance_of?(Standings::Leaderboard)
+      @ring.leaderboard.instance_of?(Standings::Leaderboard)
+      @shoe.leaderboard.instance_of?(Standings::Leaderboard)
+      @belt.leaderboard.instance_of?(Standings::Leaderboard)
+      @watch.leaderboard.instance_of?(Standings::Leaderboard)
+      @food.leaderboard.instance_of?(Standings::Leaderboard)
+
+      @cell.leaderboard.to_hash.should  == {
         current_product_rank: @cell.current_product_rank,
         products_around: @cell.products_around,
         top_products: Product.top_products
       }
 
-      @ring.leaderboard(5).should  == {
+      @ring.leaderboard.to_hash(5).should  == {
         current_product_rank: @ring.current_product_rank,
         products_around: @ring.products_around,
         top_products: Product.top_products(5)
       }
 
-      @shoe.leaderboard(2).should  == {
+      @shoe.leaderboard.to_hash(2).should  == {
         current_product_rank: @shoe.current_product_rank,
         products_around: @shoe.products_around,
         top_products: Product.top_products(2)
       }
 
-      @belt.leaderboard.should  == {
+      @belt.leaderboard.to_hash.should  == {
         current_product_rank: @belt.current_product_rank,
         products_around: @belt.products_around,
         top_products: Product.top_products
       }
 
-      @watch.leaderboard(4).should  == {
+      @watch.leaderboard.to_hash(4).should  == {
         current_product_rank: @watch.current_product_rank,
         products_around: @watch.products_around,
         top_products: Product.top_products(4)
       }
 
-      @food.leaderboard(3).should  == {
+      @food.leaderboard.to_hash(3).should  == {
         current_product_rank: @food.current_product_rank,
         products_around: @food.products_around,
         top_products: Product.top_products
@@ -231,44 +238,72 @@ describe Standings do
       @jim   = Developer.create!(name: 'Jim Weirich', ruby_gems_created: 50, total_experience: 30)
     end
 
-    it "returns ruby_heroes leaderboard" do
-      @aaron.ruby_heroes.should == {
-        current_developer_rank: 1,
-        developers_around: [ @aaron, @corey, @jim ],
-        top_developers: [ @aaron, @corey, @jim ]
-      }
-
-      @corey.ruby_heroes(1).should == {
-        current_developer_rank: 2,
-        developers_around: [ @aaron, @corey, @jim ],
-        top_developers: [ @aaron ]
-      }
-
-      @jim.ruby_heroes(2).should == {
-        current_developer_rank: 3,
-        developers_around: [ @aaron, @corey, @jim ],
-        top_developers: [ @aaron, @corey ]
-      }
+    it "returns leaderboard objects" do
+      @aaron.ruby_heroes.instance_of?(Standings::Leaderboard)
+      @corey.ruby_heroes.instance_of?(Standings::Leaderboard)
+      @jim.ruby_heroes.instance_of?(Standings::Leaderboard)
     end
 
-    it "returns veterans leaderboard" do
-      @aaron.veterans(2).should == {
-        current_developer_rank: 3,
-        developers_around: [ @corey, @aaron ],
-        top_developers: [ @jim, @corey ]
-      }
+    context "#current_developer_rank" do
+      it "returns current rank" do
+        @aaron.ruby_heroes.current_developer_rank == 1
+        @corey.ruby_heroes.current_developer_rank == 2
+        @jim.ruby_heroes.current_developer_rank   == 3
+      end
+    end
 
-      @corey.veterans.should == {
-        current_developer_rank: 2,
-        developers_around: [ @jim, @corey, @aaron ],
-        top_developers: [ @jim, @corey, @aaron ]
-      }
+    context "#developers_around" do
+      it "returns developers around" do
+        @aaron.ruby_heroes.developers_around == [ @aaron, @corey, @jim ]
+        @corey.ruby_heroes.developers_around == [ @aaron, @corey, @jim ]
+        @jim.ruby_heroes.developers_around   == [ @aaron, @corey, @jim ]
+      end
+    end
 
-      @jim.veterans(1).should == {
-        current_developer_rank: 1,
-        developers_around: [ @jim, @corey ],
-        top_developers: [ @jim ]
-      }
+    context "#top_developers" do
+      it "returns top developers" do
+        @aaron.ruby_heroes.top_developers    == [ @aaron, @corey, @jim ]
+        @corey.ruby_heroes.top_developers(2) == [ @aaron, @corey ]
+        @jim.ruby_heroes.top_developers(1)   == [ @aaron ]
+      end
+    end
+
+    context "#to_hash method" do
+      it "returns leaderboard hash" do
+        @aaron.ruby_heroes.to_hash.should == {
+          current_developer_rank: 1,
+          developers_around: [ @aaron, @corey, @jim ],
+          top_developers: [ @aaron, @corey, @jim ]
+        }
+        @corey.ruby_heroes.to_hash(1).should == {
+          current_developer_rank: 2,
+          developers_around: [ @aaron, @corey, @jim ],
+          top_developers: [ @aaron ]
+        }
+        @jim.ruby_heroes.to_hash(2).should == {
+          current_developer_rank: 3,
+          developers_around: [ @aaron, @corey, @jim ],
+          top_developers: [ @aaron, @corey ]
+        }
+      end
+
+      it "returns leaderboard hash" do
+        @aaron.veterans.to_hash(2).should == {
+          current_developer_rank: 3,
+          developers_around: [ @corey, @aaron ],
+          top_developers: [ @jim, @corey ]
+        }
+        @corey.veterans.to_hash.should == {
+          current_developer_rank: 2,
+          developers_around: [ @jim, @corey, @aaron ],
+          top_developers: [ @jim, @corey, @aaron ]
+        }
+        @jim.veterans.to_hash(1).should == {
+          current_developer_rank: 1,
+          developers_around: [ @jim, @corey ],
+          top_developers: [ @jim ]
+        }
+      end
     end
   end
 
