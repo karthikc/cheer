@@ -4,13 +4,15 @@ module Standings
     def initialize(attributes = {})
       @model_klass    = attributes[:model_klass]
       @rank_evaluator = attributes[:rank_evaluator]
+
+      define_public_methods
     end
 
     def to_hash(user_limit = 3)
       {
-        current_rank_method => rank_evaluator.current_rank,
-        rank_around_method  => rank_evaluator.rank_around,
-        top_rankers_method  => rank_evaluator.top_rankers(user_limit)
+        standing_methods[:current_rank] => self.public_send(standing_methods[:current_rank]),
+        standing_methods[:rank_around]  => self.public_send(standing_methods[:rank_around]),
+        standing_methods[:top_rankers]  => self.public_send(standing_methods[:top_rankers], user_limit)
       }
     end
 
@@ -18,20 +20,28 @@ module Standings
 
     attr_reader :model_klass, :rank_evaluator
 
-    def ranking_model_name
-      @ranking_model_name ||= model_klass.name.underscore
+    def standing_methods
+      @standing_methods ||= model_klass.standing_methods
     end
 
-    def top_rankers_method
-      @top_rankers_method ||= "top_#{ranking_model_name.pluralize}".to_sym
-    end
+    def define_public_methods
+      current_rank_method = standing_methods[:current_rank]
+      rank_around_method  = standing_methods[:rank_around]
+      top_rankers_method  = standing_methods[:top_rankers]
 
-    def current_rank_method
-      "current_#{ranking_model_name}_rank".to_sym
-    end
+      self.class_eval do
+        define_method current_rank_method do
+          rank_evaluator.current_rank
+        end
 
-    def rank_around_method
-      "#{ranking_model_name.pluralize}_around".to_sym
+        define_method rank_around_method do
+          rank_evaluator.rank_around
+        end
+
+        define_method top_rankers_method do |user_limit = 3|
+          rank_evaluator.top_rankers(user_limit)
+        end
+      end
     end
 
   end
