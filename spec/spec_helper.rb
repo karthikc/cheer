@@ -81,8 +81,8 @@ end
 class Developer < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # add_leaderboard name, column_name, array_of_sort_column_names, hash_of_options
+  # leaderboard name, column_name, array_of_sort_column_names, hash_of_options
   # Default Sort Order will be ID for developers with equal score.
-  add_leaderboard :ruby_heroes, :ruby_gems_created, sort_order: %w(name), around_limit: 3
-  add_leaderboard :veterans, :total_experience, sort_order: %w(name), around_limit: 1
+  leaderboard :ruby_heroes, :ruby_gems_created, sort_order: %w(name), around_limit: 3
+  leaderboard :veterans, :total_experience, sort_order: %w(name), around_limit: 1
 end

@@ -17,7 +17,7 @@ module Standings
       include InstanceMethods
     end
 
-    def add_leaderboard(name, column_name, args = {})
+    def leaderboard(name, column_name, args = {})
       define_method name.to_sym do |user_limit = 3|
         rank_evaluator = RankEvaluator.new(
           model_klass: self.class,

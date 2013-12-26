@@ -223,7 +223,7 @@ describe Standings do
     end
   end
 
-  describe ".add_leaderboard" do
+  describe ".leaderboard" do
     before do
       Developer.delete_all
       @aaron = Developer.create!(name: 'Aaron Patterson', ruby_gems_created: 100, total_experience: 15)

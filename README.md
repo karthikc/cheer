@@ -141,7 +141,7 @@ If the `:sort_order` is not specified, the conflicts will be resolved using the 
 
 ## Custom Leaderboards
 
-The gem will automatically add the `add_leaderboard` class method to the Movie class which will allow
+The gem will automatically add the `leaderboard` class method to the Movie class which will allow
 you to configure custom leaderboards.
 This method takes these arguments: `name`, `column_name`, `sort_order`, `around_limit`.
 
@@ -149,7 +149,7 @@ This method takes these arguments: `name`, `column_name`, `sort_order`, `around_
 class Movie < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  add_leaderboard :most_profitable, :profit, sort_order: %w(name), around_limit: 1
+  leaderboard :most_profitable, :profit, sort_order: %w(name), around_limit: 1
   # This will add the :most_profitable instance method.
   # It also takes an optional argument(integer) to limit the number of records returned from `top_movies` method.
 end
