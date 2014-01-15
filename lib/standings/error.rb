@@ -1,4 +1,5 @@
 module Error
+
   class InvalidColumnName < ArgumentError
     def message
       'First argument is not a symbol or string representing the primary rank column'
@@ -16,4 +17,5 @@ module Error
       'Third argument is not an integer representing the around limit value'
     end
   end
+
 end

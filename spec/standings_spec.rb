@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe Standings do
   context "Students With Equal Score" do
+
     before do
+      Student.delete_all
       @subrat   = Student.create!(name: 'Subrat Behera', score: 23)
       @rakesh   = Student.create!(name: 'Rakesh Verma', score: 22)
       @girish   = Student.create!(name: 'Girish Kumar', score: 21)
@@ -14,7 +16,6 @@ describe Standings do
     it "returns the current student rank if students with equal score exists" do
       # For students with equal scores, sorting should be done on the basis of id,
       # since the Student model doesn't define sort_order array.
-
       @bhanu.current_student_rank.should    == 6
       @nitin.current_student_rank.should    == 3
       @subrat.current_student_rank.should   == 1
@@ -26,6 +27,7 @@ describe Standings do
 
   context "GameUsers" do
     before do
+      GameUser.delete_all
       @dark_lord         = GameUser.create!(name: 'Dark Lord', score: 11)
       @tom_riddle        = GameUser.create!(name: 'Tom Riddle', score: 25)
       @ron_weasely       = GameUser.create!(name: 'Ron Weasely', score: 23)
@@ -60,6 +62,7 @@ describe Standings do
 
   context "GameUsers With Equal Score" do
     before do
+      GameUser.delete_all
       @dark_lord           = GameUser.create!(name: 'Dark Lord', score: 11)
       @tom_riddle          = GameUser.create!(name: 'Tom Riddle', score: 25)
       @ivan_potter         = GameUser.create!(name: 'Ivan Potter', score: 14)
@@ -109,6 +112,7 @@ describe Standings do
 
   context "Products" do
     before do
+      Product.delete_all
       @cell  = Product.create!(name: 'cell', price: 122)
       @ring  = Product.create!(name: 'ring', price: 14)
       @shoe  = Product.create!(name: 'shoe', price: 235)
@@ -145,37 +149,44 @@ describe Standings do
     end
 
     it "returns leaderboard for the current product" do
-      @cell.leaderboard.should  == {
+      @cell.leaderboard.should be_an_instance_of(Standings::Leaderboard)
+      @ring.leaderboard.should be_an_instance_of(Standings::Leaderboard)
+      @shoe.leaderboard.should be_an_instance_of(Standings::Leaderboard)
+      @belt.leaderboard.should be_an_instance_of(Standings::Leaderboard)
+      @watch.leaderboard.should be_an_instance_of(Standings::Leaderboard)
+      @food.leaderboard.should be_an_instance_of(Standings::Leaderboard)
+
+      @cell.leaderboard.to_hash.should  == {
         current_product_rank: @cell.current_product_rank,
         products_around: @cell.products_around,
         top_products: Product.top_products
       }
 
-      @ring.leaderboard(5).should  == {
+      @ring.leaderboard.to_hash(5).should  == {
         current_product_rank: @ring.current_product_rank,
         products_around: @ring.products_around,
         top_products: Product.top_products(5)
       }
 
-      @shoe.leaderboard(2).should  == {
+      @shoe.leaderboard.to_hash(2).should  == {
         current_product_rank: @shoe.current_product_rank,
         products_around: @shoe.products_around,
         top_products: Product.top_products(2)
       }
 
-      @belt.leaderboard.should  == {
+      @belt.leaderboard.to_hash.should  == {
         current_product_rank: @belt.current_product_rank,
         products_around: @belt.products_around,
         top_products: Product.top_products
       }
 
-      @watch.leaderboard(4).should  == {
+      @watch.leaderboard.to_hash(4).should  == {
         current_product_rank: @watch.current_product_rank,
         products_around: @watch.products_around,
         top_products: Product.top_products(4)
       }
 
-      @food.leaderboard(3).should  == {
+      @food.leaderboard.to_hash(3).should  == {
         current_product_rank: @food.current_product_rank,
         products_around: @food.products_around,
         top_products: Product.top_products
@@ -187,7 +198,9 @@ describe Standings do
   context "Bad Configuration Options" do
     it "fails if primary column_name is absent" do
       lambda do
-        Class.new(ActiveRecord::Base) do
+        class ModelOne < ActiveRecord::Base
+          extend Standings::ModelAdditions
+
           # Without primary column name
           rank_by sort_order: ["name", "age DESC"], around_limit: 2
         end
@@ -196,7 +209,9 @@ describe Standings do
 
     it "fails if sort_order is not an array" do
       lambda do
-        Class.new(ActiveRecord::Base) do
+        class ModelTwo < ActiveRecord::Base
+          extend Standings::ModelAdditions
+
           # Invalid sort order
           rank_by :score, sort_order: "name", around_limit: 2
         end
@@ -205,7 +220,9 @@ describe Standings do
 
     it "fails if around_limit is zero or less" do
       lambda do
-        Class.new(ActiveRecord::Base) do
+        class ModelThree < ActiveRecord::Base
+          extend Standings::ModelAdditions
+
           # Invalid around limit
           rank_by :score, sort_order: ["name", "age DESC"], around_limit: [0, -1, -2].sample
         end
@@ -213,12 +230,81 @@ describe Standings do
     end
   end
 
-  describe "#method_missing" do
-    it "doesn't define instance methods unless any of the standing method is called" do
-      product = Product.create!(name: 'cell', price: 122)
+  describe ".leaderboard" do
+    before do
+      Developer.delete_all
+      @aaron = Developer.create!(name: 'Aaron Patterson', ruby_gems_created: 100, total_experience: 15)
+      @corey = Developer.create!(name: 'Corey Haines', ruby_gems_created: 90, total_experience: 20)
+      @jim   = Developer.create!(name: 'Jim Weirich', ruby_gems_created: 50, total_experience: 30)
+    end
 
-      Product.any_instance.should_not_receive(:define_instance_methods)
-      lambda { product.unknown_method }.should raise_error(NoMethodError)
+    it "returns leaderboard objects" do
+      @aaron.ruby_heroes.should be_an_instance_of(Standings::Leaderboard)
+      @corey.ruby_heroes.should be_an_instance_of(Standings::Leaderboard)
+      @jim.ruby_heroes.should be_an_instance_of(Standings::Leaderboard)
+    end
+
+    context "#current_developer_rank" do
+      it "returns current rank" do
+        @aaron.ruby_heroes.current_developer_rank == 1
+        @corey.ruby_heroes.current_developer_rank == 2
+        @jim.ruby_heroes.current_developer_rank   == 3
+      end
+    end
+
+    context "#developers_around" do
+      it "returns developers around" do
+        @aaron.ruby_heroes.developers_around == [ @aaron, @corey, @jim ]
+        @corey.ruby_heroes.developers_around == [ @aaron, @corey, @jim ]
+        @jim.ruby_heroes.developers_around   == [ @aaron, @corey, @jim ]
+      end
+    end
+
+    context "#top_developers" do
+      it "returns top developers" do
+        @aaron.ruby_heroes.top_developers    == [ @aaron, @corey, @jim ]
+        @corey.ruby_heroes.top_developers(2) == [ @aaron, @corey ]
+        @jim.ruby_heroes.top_developers(1)   == [ @aaron ]
+      end
+    end
+
+    context "#to_hash method" do
+      it "returns leaderboard hash" do
+        @aaron.ruby_heroes.to_hash.should == {
+          current_developer_rank: 1,
+          developers_around: [ @aaron, @corey, @jim ],
+          top_developers: [ @aaron, @corey, @jim ]
+        }
+        @corey.ruby_heroes.to_hash(1).should == {
+          current_developer_rank: 2,
+          developers_around: [ @aaron, @corey, @jim ],
+          top_developers: [ @aaron ]
+        }
+        @jim.ruby_heroes.to_hash(2).should == {
+          current_developer_rank: 3,
+          developers_around: [ @aaron, @corey, @jim ],
+          top_developers: [ @aaron, @corey ]
+        }
+      end
+
+      it "returns leaderboard hash" do
+        @aaron.veterans.to_hash(2).should == {
+          current_developer_rank: 3,
+          developers_around: [ @corey, @aaron ],
+          top_developers: [ @jim, @corey ]
+        }
+        @corey.veterans.to_hash.should == {
+          current_developer_rank: 2,
+          developers_around: [ @jim, @corey, @aaron ],
+          top_developers: [ @jim, @corey, @aaron ]
+        }
+        @jim.veterans.to_hash(1).should == {
+          current_developer_rank: 1,
+          developers_around: [ @jim, @corey ],
+          top_developers: [ @jim ]
+        }
+      end
     end
   end
+
 end

@@ -1,55 +1,41 @@
 module Standings
   module InstanceMethods
 
-    def method_missing(method_id, *args, &block)
-      method_name = method_id.to_s.to_sym
+    # Hookup event for InstanceMethods Module
+    def self.included(base)
+      current_rank_method = base.standing_methods[:current_rank]
+      rank_around_method  = base.standing_methods[:rank_around]
 
-      # Call super if method is already defined or
-      # it excludes standing methods list.
-      if method_unknown?(method_name)
-        super
-      else
-        define_instance_methods
-        public_send(method_name, *args, &block)
-      end
-    end
-
-    private
-
-    INSTANCE_METHODS = [
-      :current_rank,
-      :rank_around,
-      :prepare_leaderboard
-    ]
-
-    def method_unknown?(method_name)
-      self.methods.include?(method_name) || !self.class.standing_methods.include?(method_name)
-    end
-
-    def define_instance_methods
-      self.class.class_eval do
-        delegate *INSTANCE_METHODS, to: :rank_evaluator
-
-        # Define Rank Evaluator Method
+      base.class_eval do
+        # Define private rank_evaluator Method
         define_method :rank_evaluator do
-          @rank_evaluator ||= RankEvaluator.new(self)
+          @rank_evaluator ||= RankEvaluator.new(
+            model_klass: self.class,
+            model_object: self,
+            config: self.rank_config
+          )
         end
+        private :rank_evaluator
 
         # Define Current Rank Method
-        define_method self.standing_methods[0] do
-          current_rank
+        define_method current_rank_method do
+          rank_evaluator.current_rank
         end
 
         # Define Around Rank Method
-        define_method self.standing_methods[1] do
-          rank_around
+        define_method rank_around_method do
+          rank_evaluator.rank_around
         end
 
         # Define Leaderboard Method
-        define_method self.standing_methods[2] do |user_limit = 3|
-          prepare_leaderboard(user_limit)
+        define_method :leaderboard do |user_limit = 3|
+          Leaderboard.new(
+            model_klass: self.class,
+            rank_evaluator: rank_evaluator
+          )
         end
       end
     end
+
   end
 end
