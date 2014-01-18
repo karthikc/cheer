@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Standings do
-  context "Students With Equal Score" do
 
+  context "Students With Equal Score" do
     before do
       Student.delete_all
       @subrat   = Student.create!(name: 'Subrat Behera', score: 23)
@@ -13,15 +13,24 @@ describe Standings do
       @prateeth = Student.create!(name: 'Prateeth S', score: 20)
     end
 
+    it "returns leaderboard objects" do
+      @subrat.topers.should be_an_instance_of(Standings::Leaderboard)
+      @rakesh.topers.should be_an_instance_of(Standings::Leaderboard)
+      @girish.topers.should be_an_instance_of(Standings::Leaderboard)
+      @nitin.topers.should be_an_instance_of(Standings::Leaderboard)
+      @bhanu.topers.should be_an_instance_of(Standings::Leaderboard)
+      @prateeth.topers.should be_an_instance_of(Standings::Leaderboard)
+    end
+
     it "returns the current student rank if students with equal score exists" do
       # For students with equal scores, sorting should be done on the basis of id,
       # since the Student model doesn't define sort_order array.
-      @bhanu.current_student_rank.should    == 6
-      @nitin.current_student_rank.should    == 3
-      @subrat.current_student_rank.should   == 1
-      @rakesh.current_student_rank.should   == 2
-      @girish.current_student_rank.should   == 4
-      @prateeth.current_student_rank.should == 5
+      @bhanu.topers.current_student_rank.should    == 6
+      @nitin.topers.current_student_rank.should    == 3
+      @subrat.topers.current_student_rank.should   == 1
+      @rakesh.topers.current_student_rank.should   == 2
+      @girish.topers.current_student_rank.should   == 4
+      @prateeth.topers.current_student_rank.should == 5
     end
   end
 
@@ -36,27 +45,36 @@ describe Standings do
       @albus_dumbelldore = GameUser.create!(name: 'Albus Dumbelldore', score: 2)
     end
 
+    it "returns leaderboard objects" do
+      @dark_lord.high_scorers.should be_an_instance_of(Standings::Leaderboard)
+      @tom_riddle.high_scorers.should be_an_instance_of(Standings::Leaderboard)
+      @ron_weasely.high_scorers.should be_an_instance_of(Standings::Leaderboard)
+      @harry_potter.high_scorers.should be_an_instance_of(Standings::Leaderboard)
+      @jack_sparrow.high_scorers.should be_an_instance_of(Standings::Leaderboard)
+      @albus_dumbelldore.high_scorers.should be_an_instance_of(Standings::Leaderboard)
+    end
+
     it "returns the current user rank" do
-      @dark_lord.current_game_user_rank.should         == 5
-      @tom_riddle.current_game_user_rank.should        == 1
-      @ron_weasely.current_game_user_rank.should       == 2
-      @jack_sparrow.current_game_user_rank.should      == 4
-      @harry_potter.current_game_user_rank.should      == 3
-      @albus_dumbelldore.current_game_user_rank.should == 6
+      @dark_lord.high_scorers.current_game_user_rank.should         == 5
+      @tom_riddle.high_scorers.current_game_user_rank.should        == 1
+      @ron_weasely.high_scorers.current_game_user_rank.should       == 2
+      @jack_sparrow.high_scorers.current_game_user_rank.should      == 4
+      @harry_potter.high_scorers.current_game_user_rank.should      == 3
+      @albus_dumbelldore.high_scorers.current_game_user_rank.should == 6
     end
 
     it "returns the top rank users" do
-      GameUser.top_game_users.should    == [@tom_riddle, @ron_weasely, @harry_potter]
-      GameUser.top_game_users(2).should == [@tom_riddle, @ron_weasely]
-      GameUser.top_game_users(5).should == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow, @dark_lord]
-      GameUser.top_game_users(4).should == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow]
-      GameUser.top_game_users(1).should == [@tom_riddle]
+      @dark_lord.high_scorers.top_game_users.should    == [@tom_riddle, @ron_weasely, @harry_potter]
+      @tom_riddle.high_scorers.top_game_users(2).should == [@tom_riddle, @ron_weasely]
+      @ron_weasely.high_scorers.top_game_users(5).should == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow, @dark_lord]
+      @jack_sparrow.high_scorers.top_game_users(4).should == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow]
+      @harry_potter.high_scorers.top_game_users(1).should == [@tom_riddle]
     end
 
     it "returns user around to current user according score descending" do
-      @tom_riddle.game_users_around.should        == [@tom_riddle, @ron_weasely, @harry_potter]
-      @harry_potter.game_users_around.should      == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow, @dark_lord]
-      @albus_dumbelldore.game_users_around.should == [@jack_sparrow, @dark_lord, @albus_dumbelldore]
+      @tom_riddle.high_scorers.game_users_around.should        == [@tom_riddle, @ron_weasely, @harry_potter]
+      @harry_potter.high_scorers.game_users_around.should      == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow, @dark_lord]
+      @albus_dumbelldore.high_scorers.game_users_around.should == [@jack_sparrow, @dark_lord, @albus_dumbelldore]
     end
   end
 
@@ -76,37 +94,37 @@ describe Standings do
     end
 
     it "returns the current user rank if users with equal score exists" do
-      @dark_lord.current_game_user_rank.should           == 8
-      @tom_riddle.current_game_user_rank.should          == 1
-      @ivan_potter.current_game_user_rank.should         == 4
-      @ron_weasely.current_game_user_rank.should         == 2
-      @harry_potter.current_game_user_rank.should        == 3
-      @jerry_potter.current_game_user_rank.should        == 5
-      @jack_sparrow_1.current_game_user_rank.should      == 7
-      @jack_sparrow_2.current_game_user_rank.should      == 6
-      @albus_dumbelldore.current_game_user_rank.should   == 9
-      @duglous_dumbelldore.current_game_user_rank.should == 10
+      @dark_lord.high_scorers.current_game_user_rank.should           == 8
+      @tom_riddle.high_scorers.current_game_user_rank.should          == 1
+      @ivan_potter.high_scorers.current_game_user_rank.should         == 4
+      @ron_weasely.high_scorers.current_game_user_rank.should         == 2
+      @harry_potter.high_scorers.current_game_user_rank.should        == 3
+      @jerry_potter.high_scorers.current_game_user_rank.should        == 5
+      @jack_sparrow_1.high_scorers.current_game_user_rank.should      == 7
+      @jack_sparrow_2.high_scorers.current_game_user_rank.should      == 6
+      @albus_dumbelldore.high_scorers.current_game_user_rank.should   == 9
+      @duglous_dumbelldore.high_scorers.current_game_user_rank.should == 10
     end
 
     it "returns the top rank users if equal score users exists" do
-      GameUser.top_game_users.should    == [@tom_riddle, @ron_weasely, @harry_potter]
-      GameUser.top_game_users(1).should == [@tom_riddle]
-      GameUser.top_game_users(2).should == [@tom_riddle, @ron_weasely]
-      GameUser.top_game_users(4).should == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter]
-      GameUser.top_game_users(5).should == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter, @jerry_potter]
+      @dark_lord.high_scorers.top_game_users.should    == [@tom_riddle, @ron_weasely, @harry_potter]
+      @tom_riddle.high_scorers.top_game_users(1).should == [@tom_riddle]
+      @ivan_potter.high_scorers.top_game_users(2).should == [@tom_riddle, @ron_weasely]
+      @ron_weasely.high_scorers.top_game_users(4).should == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter]
+      @harry_potter.high_scorers.top_game_users(5).should == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter, @jerry_potter]
     end
 
     it "returns user around current user if users with equal score exists" do
-      @dark_lord.game_users_around.should           == [@jack_sparrow_2, @jack_sparrow_1, @dark_lord, @albus_dumbelldore, @duglous_dumbelldore]
-      @tom_riddle.game_users_around.should          == [@tom_riddle, @ron_weasely, @harry_potter]
-      @ivan_potter.game_users_around.should         == [@ron_weasely, @harry_potter, @ivan_potter, @jerry_potter, @jack_sparrow_2]
-      @ron_weasely.game_users_around.should         == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter]
-      @harry_potter.game_users_around.should        == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter, @jerry_potter]
-      @jerry_potter.game_users_around.should        == [@harry_potter, @ivan_potter, @jerry_potter, @jack_sparrow_2, @jack_sparrow_1]
-      @jack_sparrow_1.game_users_around.should      == [@jerry_potter, @jack_sparrow_2, @jack_sparrow_1, @dark_lord, @albus_dumbelldore]
-      @jack_sparrow_2.game_users_around.should      == [@ivan_potter, @jerry_potter, @jack_sparrow_2, @jack_sparrow_1, @dark_lord]
-      @albus_dumbelldore.game_users_around.should   == [@jack_sparrow_1, @dark_lord, @albus_dumbelldore, @duglous_dumbelldore]
-      @duglous_dumbelldore.game_users_around.should == [@dark_lord, @albus_dumbelldore, @duglous_dumbelldore]
+      @dark_lord.high_scorers.game_users_around.should           == [@jack_sparrow_2, @jack_sparrow_1, @dark_lord, @albus_dumbelldore, @duglous_dumbelldore]
+      @tom_riddle.high_scorers.game_users_around.should          == [@tom_riddle, @ron_weasely, @harry_potter]
+      @ivan_potter.high_scorers.game_users_around.should         == [@ron_weasely, @harry_potter, @ivan_potter, @jerry_potter, @jack_sparrow_2]
+      @ron_weasely.high_scorers.game_users_around.should         == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter]
+      @harry_potter.high_scorers.game_users_around.should        == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter, @jerry_potter]
+      @jerry_potter.high_scorers.game_users_around.should        == [@harry_potter, @ivan_potter, @jerry_potter, @jack_sparrow_2, @jack_sparrow_1]
+      @jack_sparrow_1.high_scorers.game_users_around.should      == [@jerry_potter, @jack_sparrow_2, @jack_sparrow_1, @dark_lord, @albus_dumbelldore]
+      @jack_sparrow_2.high_scorers.game_users_around.should      == [@ivan_potter, @jerry_potter, @jack_sparrow_2, @jack_sparrow_1, @dark_lord]
+      @albus_dumbelldore.high_scorers.game_users_around.should   == [@jack_sparrow_1, @dark_lord, @albus_dumbelldore, @duglous_dumbelldore]
+      @duglous_dumbelldore.high_scorers.game_users_around.should == [@dark_lord, @albus_dumbelldore, @duglous_dumbelldore]
     end
   end
 
@@ -121,75 +139,77 @@ describe Standings do
       @food  = Product.create!(name: 'food', price: 9)
     end
 
+    it "returns leaderboard objects" do
+      @cell.costliest.should be_an_instance_of(Standings::Leaderboard)
+      @ring.costliest.should be_an_instance_of(Standings::Leaderboard)
+      @shoe.costliest.should be_an_instance_of(Standings::Leaderboard)
+      @belt.costliest.should be_an_instance_of(Standings::Leaderboard)
+      @watch.costliest.should be_an_instance_of(Standings::Leaderboard)
+      @food.costliest.should be_an_instance_of(Standings::Leaderboard)
+    end
+
     it "returns the current product rank" do
-      @cell.current_product_rank.should  == 3
-      @ring.current_product_rank.should  == 5
-      @shoe.current_product_rank.should  == 2
-      @belt.current_product_rank.should  == 4
-      @watch.current_product_rank.should == 1
-      @food.current_product_rank.should  == 6
+      @cell.costliest.current_product_rank.should  == 3
+      @ring.costliest.current_product_rank.should  == 5
+      @shoe.costliest.current_product_rank.should  == 2
+      @belt.costliest.current_product_rank.should  == 4
+      @watch.costliest.current_product_rank.should == 1
+      @food.costliest.current_product_rank.should  == 6
     end
 
     it "returns the Top products" do
-      Product.top_products(2).should == [@watch, @shoe]
-      Product.top_products(3).should == [@watch, @shoe, @cell]
-      Product.top_products(4).should == [@watch, @shoe, @cell, @belt]
-      Product.top_products(5).should == [@watch, @shoe, @cell, @belt, @ring]
-      Product.top_products(6).should == [@watch, @shoe, @cell, @belt, @ring, @food]
-      Product.top_products(7).should == [@watch, @shoe, @cell, @belt, @ring, @food]
+      @cell.costliest.top_products(2).should == [@watch, @shoe]
+      @cell.costliest.top_products(3).should == [@watch, @shoe, @cell]
+      @cell.costliest.top_products(4).should == [@watch, @shoe, @cell, @belt]
+      @cell.costliest.top_products(5).should == [@watch, @shoe, @cell, @belt, @ring]
+      @cell.costliest.top_products(6).should == [@watch, @shoe, @cell, @belt, @ring, @food]
+      @cell.costliest.top_products(7).should == [@watch, @shoe, @cell, @belt, @ring, @food]
     end
 
     it "returns product around the current product" do
-      @cell.products_around.should  == [@watch, @shoe, @cell, @belt, @ring, @food]
-      @ring.products_around.should  == [@shoe, @cell, @belt, @ring, @food]
-      @shoe.products_around.should  == [@watch, @shoe, @cell, @belt, @ring]
-      @belt.products_around.should  == [@watch, @shoe, @cell, @belt, @ring, @food]
-      @watch.products_around.should == [@watch, @shoe, @cell, @belt]
-      @food.products_around.should  == [@cell, @belt, @ring, @food]
+      @cell.costliest.products_around.should  == [@watch, @shoe, @cell, @belt, @ring, @food]
+      @ring.costliest.products_around.should  == [@shoe, @cell, @belt, @ring, @food]
+      @shoe.costliest.products_around.should  == [@watch, @shoe, @cell, @belt, @ring]
+      @belt.costliest.products_around.should  == [@watch, @shoe, @cell, @belt, @ring, @food]
+      @watch.costliest.products_around.should == [@watch, @shoe, @cell, @belt]
+      @food.costliest.products_around.should  == [@cell, @belt, @ring, @food]
     end
 
     it "returns leaderboard for the current product" do
-      @cell.leaderboard.should be_an_instance_of(Standings::Leaderboard)
-      @ring.leaderboard.should be_an_instance_of(Standings::Leaderboard)
-      @shoe.leaderboard.should be_an_instance_of(Standings::Leaderboard)
-      @belt.leaderboard.should be_an_instance_of(Standings::Leaderboard)
-      @watch.leaderboard.should be_an_instance_of(Standings::Leaderboard)
-      @food.leaderboard.should be_an_instance_of(Standings::Leaderboard)
-
-      @cell.leaderboard.to_hash.should  == {
-        current_product_rank: @cell.current_product_rank,
-        products_around: @cell.products_around,
-        top_products: Product.top_products
+      @cell.costliest.to_hash.should == {
+        current_product_rank: 3,
+        products_around: [@watch, @shoe, @cell, @belt, @ring, @food],
+        top_products: [@watch, @shoe, @cell]
       }
 
-      @ring.leaderboard.to_hash(5).should  == {
-        current_product_rank: @ring.current_product_rank,
-        products_around: @ring.products_around,
-        top_products: Product.top_products(5)
+      @ring.costliest.to_hash(5).should == {
+        current_product_rank: 5,
+        products_around: [@shoe, @cell, @belt, @ring, @food],
+        top_products: [@watch, @shoe, @cell, @belt, @ring]
       }
 
-      @shoe.leaderboard.to_hash(2).should  == {
-        current_product_rank: @shoe.current_product_rank,
-        products_around: @shoe.products_around,
-        top_products: Product.top_products(2)
+      @shoe.costliest.to_hash(2).should == {
+        current_product_rank: 2,
+        products_around: [@watch, @shoe, @cell, @belt, @ring],
+        top_products: [@watch, @shoe]
       }
 
-      @belt.leaderboard.to_hash.should  == {
-        current_product_rank: @belt.current_product_rank,
-        products_around: @belt.products_around,
-        top_products: Product.top_products
+      @belt.costliest.to_hash.should == {
+        current_product_rank: 4,
+        products_around: [@watch, @shoe, @cell, @belt, @ring, @food],
+        top_products: [@watch, @shoe, @cell]
       }
 
-      @watch.leaderboard.to_hash(4).should  == {
-        current_product_rank: @watch.current_product_rank,
-        products_around: @watch.products_around,
-        top_products: Product.top_products(4)
+      @watch.costliest.to_hash(4).should == {
+        current_product_rank: 1,
+        products_around: [@watch, @shoe, @cell, @belt],
+        top_products: [@watch, @shoe, @cell, @belt]
       }
 
-      @food.leaderboard.to_hash(3).should  == {
-        current_product_rank: @food.current_product_rank,
-        products_around: @food.products_around,
-        top_products: Product.top_products
+      @food.costliest.to_hash(3).should == {
+        current_product_rank: 6,
+        products_around: [@cell, @belt, @ring, @food],
+        top_products: [@watch, @shoe, @cell]
       }
     end
   end
@@ -197,35 +217,50 @@ describe Standings do
   # Bad Configurations
   context "Bad Configuration Options" do
     it "fails if primary column_name is absent" do
-      lambda do
-        class ModelOne < ActiveRecord::Base
-          extend Standings::ModelAdditions
+      class ModelOne
+        include ActiveModel::Model
+        attr_accessor :score
 
-          # Without primary column name
-          rank_by sort_order: ["name", "age DESC"], around_limit: 2
-        end
+        extend Standings::ModelAdditions
+
+        # Without primary column name
+        leaderboard :bad_config, column_name: '', sort_order: ["name", "age DESC"], around_limit: 2
+      end
+
+      lambda do
+        ModelOne.new(score: 5).bad_config
       end.should raise_error(Error::InvalidColumnName)
     end
 
     it "fails if sort_order is not an array" do
-      lambda do
-        class ModelTwo < ActiveRecord::Base
-          extend Standings::ModelAdditions
+      class ModelTwo
+        include ActiveModel::Model
+        attr_accessor :score
 
-          # Invalid sort order
-          rank_by :score, sort_order: "name", around_limit: 2
-        end
+        extend Standings::ModelAdditions
+
+        # Invalid sort order
+        leaderboard :bad_config, column_name: :score, sort_order: "name", around_limit: 2
+      end
+
+      lambda do
+        ModelTwo.new(score: 5).bad_config
       end.should raise_error(Error::InvalidSortOrder)
     end
 
     it "fails if around_limit is zero or less" do
-      lambda do
-        class ModelThree < ActiveRecord::Base
-          extend Standings::ModelAdditions
+      class ModelThree
+        include ActiveModel::Model
+        attr_accessor :score
 
-          # Invalid around limit
-          rank_by :score, sort_order: ["name", "age DESC"], around_limit: [0, -1, -2].sample
-        end
+        extend Standings::ModelAdditions
+
+        # Invalid around limit
+        leaderboard :bad_config, column_name: :score, sort_order: ["name", "age DESC"], around_limit: [0, -1, -2].sample
+      end
+
+      lambda do
+        ModelThree.new(score: 5).bad_config
       end.should raise_error(Error::InvalidAroundLimit)
     end
   end

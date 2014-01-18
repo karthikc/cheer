@@ -7,7 +7,6 @@
 $:.unshift File.dirname(__FILE__) + '/../lib'
 
 require 'active_record'
-require 'active_support/inflector'
 require 'sqlite3'
 require 'standings'
 
@@ -53,36 +52,46 @@ ActiveRecord::Schema.define do
     t.integer :ruby_gems_created, default: 0
     t.timestamps
   end
-
 end
 
 class GameUser < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # rank_by column_name, array_of_sort_column_names, hash_of_options
-  rank_by :score, sort_order: ["name", "age DESC"], around_limit: 2
+  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
+  # Default Sort Order will be ID for developers with equal score.
+  leaderboard :high_scorers, column_name: :score,
+                             sort_order: ["name", "age DESC"],
+                             around_limit: 2
 end
 
 class Product < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # rank_by column_name, array_of_sort_column_names, hash_of_options
-  rank_by :price, sort_order: %w(name), around_limit: 3
+  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
+  # Default Sort Order will be ID for developers with equal score.
+  leaderboard :costliest, column_name: :price,
+                          sort_order: %w(name),
+                          around_limit: 3
 end
 
 class Student < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # rank_by column_name, array_of_sort_column_names, hash_of_options
-  # Default Sort Order will be ID for students with equal score.
-  rank_by :score
+  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
+  # Default Sort Order will be ID for developers with equal score.
+  leaderboard :topers, column_name: :score
 end
 
 class Developer < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # leaderboard name, column_name, array_of_sort_column_names, hash_of_options
+  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
   # Default Sort Order will be ID for developers with equal score.
-  leaderboard :ruby_heroes, :ruby_gems_created, sort_order: %w(name), around_limit: 3
-  leaderboard :veterans, :total_experience, sort_order: %w(name), around_limit: 1
+  leaderboard :ruby_heroes, column_name: :ruby_gems_created,
+                            sort_order: %w(name),
+                            around_limit: 3
+
+  leaderboard :veterans, column_name: 'total_experience',
+                         sort_order: %w(name),
+                         around_limit: 1
 end
