@@ -3,8 +3,8 @@ module Standings
 
     attr_reader :column_name, :sort_order, :around_limit
 
-    def initialize(column_name, args = {})
-      @column_name  = parse_column_name(column_name)
+    def initialize(args = {})
+      @column_name  = parse_column_name(args[:column_name])
       @sort_order   = parse_sort_order(args[:sort_order])
       @around_limit = parse_around_limit(args[:around_limit])
 

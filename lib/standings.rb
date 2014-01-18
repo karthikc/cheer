@@ -4,6 +4,4 @@ require 'standings/error'
 require 'standings/argument'
 require 'standings/leaderboard'
 require 'standings/rank_evaluator'
-
 require 'standings/model_additions'
-require 'standings/instance_methods'
