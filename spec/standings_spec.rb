@@ -64,9 +64,9 @@ describe Standings do
     end
 
     it "returns the top rank users" do
-      @dark_lord.high_scorers.top_game_users.should    == [@tom_riddle, @ron_weasely, @harry_potter]
-      @tom_riddle.high_scorers.top_game_users(2).should == [@tom_riddle, @ron_weasely]
-      @ron_weasely.high_scorers.top_game_users(5).should == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow, @dark_lord]
+      @dark_lord.high_scorers.top_game_users.should       == [@tom_riddle, @ron_weasely, @harry_potter]
+      @tom_riddle.high_scorers.top_game_users(2).should   == [@tom_riddle, @ron_weasely]
+      @ron_weasely.high_scorers.top_game_users(5).should  == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow, @dark_lord]
       @jack_sparrow.high_scorers.top_game_users(4).should == [@tom_riddle, @ron_weasely, @harry_potter, @jack_sparrow]
       @harry_potter.high_scorers.top_game_users(1).should == [@tom_riddle]
     end
@@ -107,10 +107,10 @@ describe Standings do
     end
 
     it "returns the top rank users if equal score users exists" do
-      @dark_lord.high_scorers.top_game_users.should    == [@tom_riddle, @ron_weasely, @harry_potter]
-      @tom_riddle.high_scorers.top_game_users(1).should == [@tom_riddle]
-      @ivan_potter.high_scorers.top_game_users(2).should == [@tom_riddle, @ron_weasely]
-      @ron_weasely.high_scorers.top_game_users(4).should == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter]
+      @dark_lord.high_scorers.top_game_users.should       == [@tom_riddle, @ron_weasely, @harry_potter]
+      @tom_riddle.high_scorers.top_game_users(1).should   == [@tom_riddle]
+      @ivan_potter.high_scorers.top_game_users(2).should  == [@tom_riddle, @ron_weasely]
+      @ron_weasely.high_scorers.top_game_users(4).should  == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter]
       @harry_potter.high_scorers.top_game_users(5).should == [@tom_riddle, @ron_weasely, @harry_potter, @ivan_potter, @jerry_potter]
     end
 
@@ -216,52 +216,91 @@ describe Standings do
 
   # Bad Configurations
   context "Bad Configuration Options" do
-    it "fails if primary column_name is absent" do
-      class ModelOne
+    before do
+      @klass = Class.new do
         include ActiveModel::Model
+
+        def self.name; "anonymus"; end
+
         attr_accessor :score
 
         extend Standings::ModelAdditions
 
+        def self.column_names; ["score"]; end
+      end
+    end
+
+    it "fails if column_name is blank" do
+      @klass.class_eval do
         # Without primary column name
-        leaderboard :bad_config, column_name: '', sort_order: ["name", "age DESC"], around_limit: 2
+        leaderboard :bad_config, column_name: '',
+                                 sort_order: ["name", "age DESC"],
+                                 around_limit: 2
       end
 
-      lambda do
-        ModelOne.new(score: 5).bad_config
-      end.should raise_error(Error::InvalidColumnName)
+      lambda {
+        @klass.new(score: 5).bad_config
+      }.should raise_error(Standings::Error::InvalidColumnName)
+    end
+
+    it "fails if column_name is not a database column" do
+      @klass.class_eval do
+        leaderboard :bad_config, column_name: :im_not_in_db,
+                                 sort_order: ["name", "age DESC"],
+                                 around_limit: 2
+      end
+
+      lambda {
+        @klass.new(score: 5).bad_config
+      }.should raise_error(Standings::Error::InvalidColumnName)
     end
 
     it "fails if sort_order is not an array" do
-      class ModelTwo
-        include ActiveModel::Model
-        attr_accessor :score
-
-        extend Standings::ModelAdditions
-
+      @klass.class_eval do
         # Invalid sort order
-        leaderboard :bad_config, column_name: :score, sort_order: "name", around_limit: 2
+        leaderboard :bad_config, column_name: :score,
+                                 sort_order: "name",
+                                 around_limit: 2
       end
 
-      lambda do
-        ModelTwo.new(score: 5).bad_config
-      end.should raise_error(Error::InvalidSortOrder)
+      lambda {
+        @klass.new(score: 5).bad_config
+      }.should raise_error(Standings::Error::InvalidSortOrder)
     end
 
     it "fails if around_limit is zero or less" do
-      class ModelThree
-        include ActiveModel::Model
-        attr_accessor :score
-
-        extend Standings::ModelAdditions
-
+      @klass.class_eval do
         # Invalid around limit
-        leaderboard :bad_config, column_name: :score, sort_order: ["name", "age DESC"], around_limit: [0, -1, -2].sample
+        leaderboard :bad_config, column_name: :score,
+                                 sort_order: ["name", "age DESC"],
+                                 around_limit: [0, -1, -2].sample
       end
 
-      lambda do
-        ModelThree.new(score: 5).bad_config
-      end.should raise_error(Error::InvalidAroundLimit)
+      lambda {
+        @klass.new(score: 5).bad_config
+      }.should raise_error(Standings::Error::InvalidAroundLimit)
+    end
+
+    it "fails if scope provided is blank" do
+      @klass.class_eval do
+        leaderboard :bad_config, column_name: :score,
+                                 scope: ''
+      end
+
+      lambda {
+        @klass.new(score: 5).bad_config
+      }.should raise_error(Standings::Error::InvalidScope)
+    end
+
+    it "fails if scope provided is not defined" do
+      @klass.class_eval do
+        leaderboard :bad_config, column_name: :score,
+                                 scope: :some_undefined_scope
+      end
+
+      lambda {
+        @klass.new(score: 5).bad_config
+      }.should raise_error(Standings::Error::InvalidScope)
     end
   end
 
@@ -339,6 +378,39 @@ describe Standings do
           top_developers: [ @jim ]
         }
       end
+    end
+  end
+
+  describe "the scope option" do
+    before do
+      Student.delete_all
+
+      @lucy   = Student.create!(name: 'Lucy Pevensie', score: 65, age: 18)
+      @edmund = Student.create!(name: 'Edmund Pevensie', score: 80, age: 17)
+      @peter  = Student.create!(name: 'Peter Pevensie', score: 70, age: 14)
+      @susan  = Student.create!(name: 'Susan Pevensie', score: 90, age: 9)
+
+      @aslan       = Student.create!(name: 'Aslan', score: 85, age: 35)
+      @white_witch = Student.create!(name: 'Jadis, the White Witch', score: 70, age: 200)
+      @mr_tumnus   = Student.create!(name: 'Mr Tumnus', score: 50, age: 25)
+    end
+
+    it "returns leaderboard objects" do
+      @lucy.young_topers.should be_an_instance_of(Standings::Leaderboard)
+      @edmund.young_topers.should be_an_instance_of(Standings::Leaderboard)
+      @peter.young_topers.should be_an_instance_of(Standings::Leaderboard)
+      @susan.young_topers.should be_an_instance_of(Standings::Leaderboard)
+    end
+
+    it "returns current student rank in that scope" do
+      @lucy.young_topers.current_student_rank.should   == 4
+      @edmund.young_topers.current_student_rank.should == 2
+      @peter.young_topers.current_student_rank.should  == 3
+      @susan.young_topers.current_student_rank.should  == 1
+
+      @aslan.young_topers.current_student_rank.should       == 2
+      @white_witch.young_topers.current_student_rank.should == 3
+      @mr_tumnus.young_topers.current_student_rank.should   == 4
     end
   end
 
