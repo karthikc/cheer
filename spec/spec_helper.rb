@@ -57,7 +57,7 @@ end
 class GameUser < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
+  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit, :scope}
   # Default Sort Order will be ID for game_users with equal score.
   leaderboard :high_scorers, column_name: :score,
                              sort_order: ["name", "age DESC"],
@@ -67,7 +67,7 @@ end
 class Product < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
+  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit, :scope}
   # Default Sort Order will be ID for products with equal price.
   leaderboard :costliest, column_name: :price,
                           sort_order: %w(name),
@@ -77,15 +77,21 @@ end
 class Student < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
+  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit, :scope}
   # Default Sort Order will be ID for students with equal score.
   leaderboard :topers, column_name: :score
+
+  scope :youngster, -> { where('age < 18') }
+
+  leaderboard :young_topers, column_name: :score,
+                             sort_order: %w(name),
+                             scope: :youngster
 end
 
 class Developer < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
+  # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit, :scope}
   leaderboard :ruby_heroes, column_name: :ruby_gems_created,
                             sort_order: %w(name),
                             around_limit: 3
