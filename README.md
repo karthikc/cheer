@@ -24,13 +24,13 @@ Or install it yourself as:
 
 ## Basic Usage
 
-Consider you have a `Movie` model which has a `views` column that stores the number of times users have viewed the movie.
+Consider a `Movie` model which has a `views` column that stores the number of times users have viewed the movie and a `profit` column that contains the total profit made by that movie.
 
 ```ruby
 class Movie < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  leaderboard :most_viewed, column_name: :views
+  leaderboard :viewership_leaderboard, column_name: :views
 end
 ```
 
@@ -79,11 +79,11 @@ This method takes these arguments: `name`, `column_name`, `sort_order`, `around_
 class Movie < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  leaderboard :most_profitable, column_name: :profit,
+  leaderboard :profitability_leaderboard, column_name: :profit,
                                 sort_order: %w(name),
                                 around_limit: 1
 
-  # This will add the :most_profitable instance method.
+  # This will add the :profitability_leaderboard instance method.
   # It also takes an optional argument(integer) to limit the number of records returned from `top_movies` method.
 end
 
@@ -93,15 +93,15 @@ kill_bill      = Movie.find_by_name("Kill Bill")
 death_proof    = Movie.find_by_name("Death Proof")
 jackie_brown   = Movie.find_by_name("Jackie Brown")
 
-pulp_fiction.most_profitable # => #<Standings::Leaderboard:0xb121a14>
-pulp_fiction.most_profitable.current_movie_rank # => 2
-pulp_fiction.most_profitable.movies_around # => [reservoir_dogs, pulp_fiction, jackie_brown]
-pulp_fiction.most_profitable.top_movies # => [pulp_fiction, reservoir_dogs, kill_bill]
-pulp_fiction.most_profitable.top_movies(2) # => [pulp_fiction, reservoir_dogs]
+pulp_fiction.profitability_leaderboard # => #<Standings::Leaderboard:0xb121a14>
+pulp_fiction.profitability_leaderboard.current_movie_rank # => 2
+pulp_fiction.profitability_leaderboard.movies_around # => [reservoir_dogs, pulp_fiction, jackie_brown]
+pulp_fiction.profitability_leaderboard.top_movies # => [pulp_fiction, reservoir_dogs, kill_bill]
+pulp_fiction.profitability_leaderboard.top_movies(2) # => [pulp_fiction, reservoir_dogs]
 
-pulp_fiction.most_profitable.to_hash # => {current_movie_rank: 2, movies_around: [reservoir_dogs, pulp_fiction, jackie_brown], top_movies: [pulp_fiction, reservoir_dogs, kill_bill]}
+pulp_fiction.profitability_leaderboard.to_hash # => {current_movie_rank: 2, movies_around: [reservoir_dogs, pulp_fiction, jackie_brown], top_movies: [pulp_fiction, reservoir_dogs, kill_bill]}
 
-death_proof.most_profitable.to_hash(2) # => {current_movie_rank: 6, movies_around: [kill_bill, death_proof], top_movies: [pulp_fiction, reservoir_dogs]}
+death_proof.profitability_leaderboard.to_hash(2) # => {current_movie_rank: 6, movies_around: [kill_bill, death_proof], top_movies: [pulp_fiction, reservoir_dogs]}
 ```
 
 
@@ -113,7 +113,7 @@ death_proof.most_profitable.to_hash(2) # => {current_movie_rank: 6, movies_aroun
 class Movie < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  leaderboard :most_viewed, column_name: :views,
+  leaderboard :viewership_leaderboard, column_name: :views,
                             sort_order: ["released_on asc", "number_of_awards desc"]
 end
 ```
@@ -130,11 +130,11 @@ The default number of objects returned by `movies_around` can be overwritten usi
 class Movie < ActiveRecord::Base
   extend Standings::ModelAdditions
 
-  leaderboard :most_viewed, column_name: :views, around_limit: 1
+  leaderboard :viewership_leaderboard, column_name: :views, around_limit: 1
 end
 
 kill_bill = Movie.find_by_name("Kill Bill")
-kill_bill.most_viewed.movies_around # => [reservoir_dogs, kill_bill, death_proof]
+kill_bill.viewership_leaderboard.movies_around # => [reservoir_dogs, kill_bill, death_proof]
 ```
 
 
