@@ -19,9 +19,8 @@ module Standings
     def leaderboard(name, args = {})
       define_method name.to_sym do |user_limit = 3|
         rank_evaluator = RankEvaluator.new(
-          model_klass: self.class,
           model_object: self,
-          config: Argument.new(args)
+          config: Argument.new(args.merge(model_klass: self.class))
         )
 
         Leaderboard.new(

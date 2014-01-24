@@ -15,9 +15,10 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Standings::VERSION
 
-  # Add development dependencies
-  gem.add_development_dependency 'rake'
+  # Runtime Dependencies
+  gem.add_dependency 'activerecord', '>= 3.0'
+
+  # Development dependencies
   gem.add_development_dependency 'rspec', '~> 2.14'
   gem.add_development_dependency 'sqlite3'
-  gem.add_dependency 'activerecord', '>= 3.0'
 end

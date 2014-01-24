@@ -1,21 +1,23 @@
-module Error
+module Standings
+  module Error
 
-  class InvalidColumnName < ArgumentError
-    def message
-      'First argument is not a symbol or string representing the primary rank column'
+    class InvalidColumnName < ArgumentError
+      def message
+        ':column_name option is not a symbol or string'
+      end
     end
-  end
 
-  class InvalidSortOrder < ArgumentError
-    def message
-      'Second argument is not an array of symbols or strings representing the sort column values'
+    class InvalidSortOrder < ArgumentError
+      def message
+        ':sort_order option is not an array of symbols or strings'
+      end
     end
-  end
 
-  class InvalidAroundLimit < ArgumentError
-    def message
-      'Third argument is not an integer representing the around limit value'
+    class InvalidAroundLimit < ArgumentError
+      def message
+        ':around_limit option is not an integer'
+      end
     end
-  end
 
+  end
 end
