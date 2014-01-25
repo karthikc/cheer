@@ -1,4 +1,4 @@
-module Standings
+module ElegantLeaderboard
   module Error
 
     class InvalidColumnName < ArgumentError

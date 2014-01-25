@@ -1,4 +1,4 @@
-module Standings
+module ElegantLeaderboard
   class RankEvaluator
     extend Forwardable
 
