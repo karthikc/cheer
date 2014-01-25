@@ -1,4 +1,4 @@
-module Standings
+module ElegantLeaderboard
   class Argument
 
     attr_reader :column_name, :sort_order, :around_limit, :model_klass

@@ -1,4 +1,4 @@
-# Standings
+# ElegantLeaderboard
 
 A ruby gem to quickly add leaderboard functionality to any existing model in a rails application. This gem makes it easy to add leaderboards not only in games, where they are usually used but also into any other application which contains rankable models.
 
@@ -7,7 +7,7 @@ A ruby gem to quickly add leaderboard functionality to any existing model in a r
 Add this line to your application's Gemfile:
 
 ```ruby
-    gem 'standings'
+    gem 'elegant-leaderboard'
 ```
 
 And then execute:
@@ -19,7 +19,7 @@ And then execute:
 Or install it yourself as:
 
 ```
-    $ gem install standings
+    $ gem install elegant-leaderboard
 ```
 
 ## Basic Usage
@@ -28,7 +28,7 @@ Consider a `Movie` model which has a `views` column that stores the number of ti
 
 ```ruby
 class Movie < ActiveRecord::Base
-  extend Standings::ModelAdditions
+  extend ElegantLeaderboard::ModelAdditions
 
   leaderboard :viewership_leaderboard, column_name: :views
 end
@@ -77,11 +77,11 @@ This method takes these arguments: `name`, `column_name`, `sort_order`, `around_
 
 ```ruby
 class Movie < ActiveRecord::Base
-  extend Standings::ModelAdditions
+  extend ElegantLeaderboard::ModelAdditions
 
   leaderboard :profitability_leaderboard, column_name: :profit,
-                                sort_order: %w(name),
-                                around_limit: 1
+                                          sort_order: %w(name),
+                                          around_limit: 1
 
   # This will add the :profitability_leaderboard instance method.
   # It also takes an optional argument(integer) to limit the number of records returned from `top_movies` method.
@@ -93,7 +93,7 @@ kill_bill      = Movie.find_by_name("Kill Bill")
 death_proof    = Movie.find_by_name("Death Proof")
 jackie_brown   = Movie.find_by_name("Jackie Brown")
 
-pulp_fiction.profitability_leaderboard # => #<Standings::Leaderboard:0xb121a14>
+pulp_fiction.profitability_leaderboard # => #<ElegantLeaderboard::Leaderboard:0xb121a14>
 pulp_fiction.profitability_leaderboard.current_movie_rank # => 2
 pulp_fiction.profitability_leaderboard.movies_around # => [reservoir_dogs, pulp_fiction, jackie_brown]
 pulp_fiction.profitability_leaderboard.top_movies # => [pulp_fiction, reservoir_dogs, kill_bill]
@@ -111,10 +111,10 @@ death_proof.profitability_leaderboard.to_hash(2) # => {current_movie_rank: 6, mo
 
 ```ruby
 class Movie < ActiveRecord::Base
-  extend Standings::ModelAdditions
+  extend ElegantLeaderboard::ModelAdditions
 
   leaderboard :viewership_leaderboard, column_name: :views,
-                            sort_order: ["released_on asc", "number_of_awards desc"]
+                                       sort_order: ["released_on asc", "number_of_awards desc"]
 end
 ```
 
@@ -128,9 +128,10 @@ The default number of objects returned by `movies_around` can be overwritten usi
 
 ```ruby
 class Movie < ActiveRecord::Base
-  extend Standings::ModelAdditions
+  extend ElegantLeaderboard::ModelAdditions
 
-  leaderboard :viewership_leaderboard, column_name: :views, around_limit: 1
+  leaderboard :viewership_leaderboard, column_name: :views,
+                                       around_limit: 1
 end
 
 kill_bill = Movie.find_by_name("Kill Bill")
@@ -143,6 +144,7 @@ kill_bill.viewership_leaderboard.movies_around # => [reservoir_dogs, kill_bill, 
 
 
 ## Authors
+* Karthik C: https://github.com/karthikc
 * Nitin Misra: https://github.com/nitinstp23
 * Rakesh Verma: https://github.com/rakesh87
 

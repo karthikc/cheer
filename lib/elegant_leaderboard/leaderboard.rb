@@ -1,4 +1,4 @@
-module Standings
+module ElegantLeaderboard
   class Leaderboard
 
     def initialize(attributes = {})

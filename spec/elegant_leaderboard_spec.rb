@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Standings do
+describe ElegantLeaderboard do
 
   context "Students With Equal Score" do
     before do
@@ -14,12 +14,12 @@ describe Standings do
     end
 
     it "returns leaderboard objects" do
-      @subrat.topers.should be_an_instance_of(Standings::Leaderboard)
-      @rakesh.topers.should be_an_instance_of(Standings::Leaderboard)
-      @girish.topers.should be_an_instance_of(Standings::Leaderboard)
-      @nitin.topers.should be_an_instance_of(Standings::Leaderboard)
-      @bhanu.topers.should be_an_instance_of(Standings::Leaderboard)
-      @prateeth.topers.should be_an_instance_of(Standings::Leaderboard)
+      @subrat.topers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @rakesh.topers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @girish.topers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @nitin.topers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @bhanu.topers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @prateeth.topers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
     end
 
     it "returns the current student rank if students with equal score exists" do
@@ -46,12 +46,12 @@ describe Standings do
     end
 
     it "returns leaderboard objects" do
-      @dark_lord.high_scorers.should be_an_instance_of(Standings::Leaderboard)
-      @tom_riddle.high_scorers.should be_an_instance_of(Standings::Leaderboard)
-      @ron_weasely.high_scorers.should be_an_instance_of(Standings::Leaderboard)
-      @harry_potter.high_scorers.should be_an_instance_of(Standings::Leaderboard)
-      @jack_sparrow.high_scorers.should be_an_instance_of(Standings::Leaderboard)
-      @albus_dumbelldore.high_scorers.should be_an_instance_of(Standings::Leaderboard)
+      @dark_lord.high_scorers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @tom_riddle.high_scorers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @ron_weasely.high_scorers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @harry_potter.high_scorers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @jack_sparrow.high_scorers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @albus_dumbelldore.high_scorers.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
     end
 
     it "returns the current user rank" do
@@ -140,12 +140,12 @@ describe Standings do
     end
 
     it "returns leaderboard objects" do
-      @cell.costliest.should be_an_instance_of(Standings::Leaderboard)
-      @ring.costliest.should be_an_instance_of(Standings::Leaderboard)
-      @shoe.costliest.should be_an_instance_of(Standings::Leaderboard)
-      @belt.costliest.should be_an_instance_of(Standings::Leaderboard)
-      @watch.costliest.should be_an_instance_of(Standings::Leaderboard)
-      @food.costliest.should be_an_instance_of(Standings::Leaderboard)
+      @cell.costliest.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @ring.costliest.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @shoe.costliest.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @belt.costliest.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @watch.costliest.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @food.costliest.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
     end
 
     it "returns the current product rank" do
@@ -224,7 +224,7 @@ describe Standings do
 
         attr_accessor :score
 
-        extend Standings::ModelAdditions
+        extend ElegantLeaderboard::ModelAdditions
 
         def self.column_names; ["score"]; end
       end
@@ -240,7 +240,7 @@ describe Standings do
 
       lambda {
         @klass.new(score: 5).bad_config
-      }.should raise_error(Standings::Error::InvalidColumnName)
+      }.should raise_error(ElegantLeaderboard::Error::InvalidColumnName)
     end
 
     it "fails if column_name is not a database column" do
@@ -252,7 +252,7 @@ describe Standings do
 
       lambda {
         @klass.new(score: 5).bad_config
-      }.should raise_error(Standings::Error::InvalidColumnName)
+      }.should raise_error(ElegantLeaderboard::Error::InvalidColumnName)
     end
 
     it "fails if sort_order is not an array" do
@@ -265,7 +265,7 @@ describe Standings do
 
       lambda {
         @klass.new(score: 5).bad_config
-      }.should raise_error(Standings::Error::InvalidSortOrder)
+      }.should raise_error(ElegantLeaderboard::Error::InvalidSortOrder)
     end
 
     it "fails if around_limit is zero or less" do
@@ -278,7 +278,7 @@ describe Standings do
 
       lambda {
         @klass.new(score: 5).bad_config
-      }.should raise_error(Standings::Error::InvalidAroundLimit)
+      }.should raise_error(ElegantLeaderboard::Error::InvalidAroundLimit)
     end
   end
 
@@ -291,9 +291,9 @@ describe Standings do
     end
 
     it "returns leaderboard objects" do
-      @aaron.ruby_heroes.should be_an_instance_of(Standings::Leaderboard)
-      @corey.ruby_heroes.should be_an_instance_of(Standings::Leaderboard)
-      @jim.ruby_heroes.should be_an_instance_of(Standings::Leaderboard)
+      @aaron.ruby_heroes.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @corey.ruby_heroes.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
+      @jim.ruby_heroes.should be_an_instance_of(ElegantLeaderboard::Leaderboard)
     end
 
     context "#current_developer_rank" do

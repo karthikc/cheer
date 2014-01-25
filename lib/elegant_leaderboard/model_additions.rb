@@ -1,4 +1,4 @@
-module Standings
+module ElegantLeaderboard
   module ModelAdditions
 
     # Hookup event for ModelAdditions Module

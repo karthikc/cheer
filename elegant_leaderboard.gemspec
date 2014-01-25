@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/standings/version', __FILE__)
+require File.expand_path('../lib/elegant_leaderboard/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name          = 'standings'
-  gem.version       = Standings::VERSION
+  gem.name          = 'elegant-leaderboard'
+  gem.version       = ElegantLeaderboard::VERSION
   gem.authors       = ['Eos Software Systems Pvt Ltd']
   gem.email         = ['info@eossys.com']
   gem.description   = %q{This gem helps you to create a leader board, and also useful to find ranking of users according to columns specified}
   gem.summary       = gem.description
-  gem.homepage      = 'https://github.com/eossys/standings'
+  gem.homepage      = 'https://github.com/eossys/elegant-leaderboard'
   gem.license       = 'MIT'
 
   gem.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
