@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.version       = ElegantLeaderboard::VERSION
   gem.authors       = ['Eos Software Systems Pvt Ltd']
   gem.email         = ['info@eossys.com']
-  gem.description   = %q{This gem helps you to create a leader board, and also useful to find ranking of users according to columns specified}
+  gem.description   = %q{A ruby gem to quickly add rankings & leaderboards to existing models in a rails application}
   gem.summary       = gem.description
   gem.homepage      = 'https://github.com/eossys/elegant-leaderboard'
   gem.license       = 'MIT'
@@ -21,5 +21,5 @@ Gem::Specification.new do |gem|
 
   # Development dependencies
   gem.add_development_dependency 'rspec', '~> 2.14'
-  gem.add_development_dependency 'sqlite3'
+  gem.add_development_dependency 'sqlite3', '~> 1.3.8'
 end
