@@ -1,4 +1,4 @@
-module ElegantLeaderboard
+module Cheer
   module ModelAdditions
 
     # Hookup event for ModelAdditions Module

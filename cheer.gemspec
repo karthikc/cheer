@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/elegant_leaderboard/version', __FILE__)
+require File.expand_path('../lib/cheer/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name          = 'elegant-leaderboard'
-  gem.version       = ElegantLeaderboard::VERSION
+  gem.name          = 'cheer'
+  gem.version       = Cheer::VERSION
   gem.authors       = ['Eos Software Systems Pvt Ltd']
   gem.email         = ['info@eossys.com']
   gem.description   = %q{A ruby gem to quickly add rankings & leaderboards to existing models in a rails application}
   gem.summary       = gem.description
-  gem.homepage      = 'https://github.com/eossys/elegant-leaderboard'
+  gem.homepage      = 'https://github.com/eossys/cheer'
   gem.license       = 'MIT'
 
   gem.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)

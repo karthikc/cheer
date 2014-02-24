@@ -1,4 +1,4 @@
-module ElegantLeaderboard
+module Cheer
   module Error
 
     class InvalidColumnName < ArgumentError
