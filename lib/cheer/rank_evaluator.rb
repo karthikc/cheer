@@ -1,4 +1,4 @@
-module ElegantLeaderboard
+module Cheer
   class RankEvaluator
     extend Forwardable
 

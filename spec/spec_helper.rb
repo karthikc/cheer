@@ -8,7 +8,7 @@ $:.unshift File.dirname(__FILE__) + '/../lib'
 
 require 'active_record'
 require 'sqlite3'
-require 'elegant_leaderboard'
+require 'cheer'
 
 ActiveRecord::Base.establish_connection(
   adapter: "sqlite3",
@@ -55,7 +55,7 @@ ActiveRecord::Schema.define do
 end
 
 class GameUser < ActiveRecord::Base
-  extend ElegantLeaderboard::ModelAdditions
+  extend Cheer::ModelAdditions
 
   # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
   # Default Sort Order will be ID for game_users with equal score.
@@ -65,7 +65,7 @@ class GameUser < ActiveRecord::Base
 end
 
 class Product < ActiveRecord::Base
-  extend ElegantLeaderboard::ModelAdditions
+  extend Cheer::ModelAdditions
 
   # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
   # Default Sort Order will be ID for products with equal price.
@@ -75,7 +75,7 @@ class Product < ActiveRecord::Base
 end
 
 class Student < ActiveRecord::Base
-  extend ElegantLeaderboard::ModelAdditions
+  extend Cheer::ModelAdditions
 
   # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
   # Default Sort Order will be ID for students with equal score.
@@ -83,7 +83,7 @@ class Student < ActiveRecord::Base
 end
 
 class Developer < ActiveRecord::Base
-  extend ElegantLeaderboard::ModelAdditions
+  extend Cheer::ModelAdditions
 
   # leaderboard leaderboard_name, {:column_name, :sort_order, :around_limit}
   leaderboard :ruby_heroes, column_name: :ruby_gems_created,

@@ -1,4 +1,4 @@
-module ElegantLeaderboard
+module Cheer
   class Leaderboard
 
     def initialize(attributes = {})

@@ -1,4 +1,4 @@
-module ElegantLeaderboard
+module Cheer
   class Argument
 
     attr_reader :column_name, :sort_order, :around_limit, :model_klass
